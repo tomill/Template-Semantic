@@ -1,0 +1,4 @@
+
+wrapper みたいなのとか Text::MicroTemplate::Extended みたいなのやる工夫とか
+
+
