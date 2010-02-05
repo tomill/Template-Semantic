@@ -1,8 +1,8 @@
 package Template::Semantic;
 use strict;
 use warnings;
+use 5.008000;
 our $VERSION = '0.01';
-
 use Carp;
 use XML::LibXML;
 use Template::Semantic::Document;

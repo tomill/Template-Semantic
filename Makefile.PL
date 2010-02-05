@@ -2,21 +2,17 @@ use inc::Module::Install;
 name 'Template-Semantic';
 all_from    'lib/Template/Semantic.pm';
 readme_from 'lib/Template/Semantic.pm';
-# homepage 'http://e8y.net/';
 
-requires_any_moose;
-requires '';
+requires 'XML::LibXML' => 1.69;
+requires 'HTML::Selector::XPath';
+requires 'Scalar::Util' => 1.19;
 
-author_tests 'xt';
 test_requires 'Test::More' => 0.88;
-# use_test_base
-
-# install_share;
+test_requires 'Test::Requires';
+use_test_base
+author_tests 'xt';
 
 auto_include_deps;
 auto_set_repository;
-githubmeta;
-
-bundle_local_lib;
 
 WriteAll;
