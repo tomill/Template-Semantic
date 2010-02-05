@@ -380,18 +380,15 @@ package main;
 
 === elem x arrayref (filters)
 --- vars
-package My::Filter;
-sub wow { $_ . '!!!' };
-
 package main;
-'id("foo")' => [ ' 100000 ', 'trim', sub { '-' . $_ }, 'comma', 'My::Filter::wow' ]
+'id("foo")' => [ ' 100000 ', 'trim', sub { '-' . $_ }, 'comma' ]
 --- template
 <root>
     <div id="foo">foo</div>
 </root>
 --- expected
 <root>
-    <div id="foo">-100,000!!!</div>
+    <div id="foo">-100,000</div>
 </root>
 
 === attr x arrayref (filters)

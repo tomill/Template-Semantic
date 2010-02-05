@@ -12,13 +12,23 @@ sub new {
     my $class = shift;
     my $self  = bless { @_ }, $class;
     
+    for (@Template::Semantic::Filter::EXPORT_OK) {
+        $self->define_filter($_ => \&{'Template::Semantic::Filter::' . $_});
+    }
+
     $self->{parser} ||= do {
         my $parser = XML::LibXML->new;
         $parser->no_network(1);
         $parser->recover(2); # It's mean "no warnings".
         $parser;
     };
+    
     $self;
+}
+
+sub define_filter {
+    my ($self, $name, $code) = @_;
+    $self->{filter}{$name} ||= $code;
 }
 
 sub process {
@@ -36,8 +46,8 @@ sub process {
     }
     
     my $doc = Template::Semantic::Document->new(
+        engine => $self,
         source => $source || "",
-        parser => $self->{parser},
     );
     $doc->process($vars || {});
 }

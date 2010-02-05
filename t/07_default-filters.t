@@ -104,3 +104,21 @@ __DATA__
     <price>This item costs $123.4567 USD.</price>
 </root>
 
+=== html_line_break
+--- vars
+'p' => [
+    qq{AAA\nBBB<br />BBB\n\nCCC\n},
+    'html_line_break',
+]
+--- template
+<root>
+    <p></p>
+</root>
+--- expected
+<root>
+    <p>AAA<br/>
+BBB&lt;br /&gt;BBB<br/>
+<br/>
+CCC<br/>
+</p>
+</root>

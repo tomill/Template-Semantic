@@ -1,9 +1,9 @@
 package Template::Semantic::Filter;
 use strict;
 use warnings;
-
 use Carp;
 use base 'Exporter';
+
 our @EXPORT_OK = qw(
     chomp
     trim
@@ -11,8 +11,14 @@ our @EXPORT_OK = qw(
     uniq
     comma
     html_line_break
-    html_para_block
 );
+
+sub get_inner_html {
+    my $node = shift;
+    my $content = "";
+    $content .= $_->serialize for $node->childNodes;
+    $content;
+}
 
 sub chomp {
     chomp;
@@ -39,15 +45,11 @@ sub comma {
    $_;
 }
 
-# Template::Filters
+# from: Template::Filters
 sub html_line_break {
-    s!(\r?\n)!<br />$1!g; # XXX
-    $_;
-}
-
-# Template::Filters
-sub html_para_block { # XXX
-
+    my $html = Template::Semantic::Filter::get_inner_html(shift);
+    $html =~ s!(\r?\n)!<br />$1!g;
+    \$html;
 }
 
 1;

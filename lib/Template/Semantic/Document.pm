@@ -1,9 +1,9 @@
 package Template::Semantic::Document;
 use strict;
 use warnings;
-
 use Carp;
 use HTML::Selector::XPath;
+use Scalar::Util qw/blessed/;
 use XML::LibXML;
 
 use overload q{""} => sub { shift->as_string }, fallback => 1;
@@ -11,8 +11,8 @@ use overload q{""} => sub { shift->as_string }, fallback => 1;
 sub new {
     my $class = shift;
     my $self  = bless {
+        engine => "",
         source => "",
-        parser => "",
         dom    => "",
         @_
     }, $class;
@@ -25,7 +25,7 @@ sub new {
         $1 . 'xmlns=""';
     }e;
     
-    $self->{dom} = $self->{parser}->parse_string($source);
+    $self->{dom} = $self->{engine}{parser}->parse_string($source);
     $self;
 }
 
@@ -37,37 +37,38 @@ sub process {
 
 sub as_string {
     my ($self) = @_;
-    my $r = "";
     if ($self->{source} =~ /^<\?xml/) {
-        $r = $self->{dom}->serialize(1);
+        return $self->{dom}->serialize(1);
     }
     else { # for skip <?xml declaration
+        my $r = "";
         if (my $dtd = $self->{dom}->internalSubset) {
             $r = $dtd->serialize . "\n";
         }
         if (my $root = $self->{dom}->documentElement) {
             $r .= $root->serialize(1);
             $r =~ s/\n*$/\n/;
+            
             if ($self->{xmlns_hacked}) {
                 $r =~ s{(<html[^>]+?)xmlns=""}{$1xmlns="http://www.w3.org/1999/xhtml"};
             }
         }
+        return $r;
     }
-    $r;
 }
 
 sub _exp_to_xpath {
     my ($self, $exp) = @_;
+    return unless $exp;
+    
     my $xpath;
-    if (not $exp) {
-        return;
-    } elsif ($exp =~ m{^/}) {
+    if ($exp =~ m{^/}) {
         $xpath = $exp;
     } elsif ($exp =~ m{^id\(}) {
         $xpath = $exp;
         $xpath =~ s{^id\((.+?)\)}{//\*\[\@id=$1\]}g; # id() hack
     } else { # css selector
-        my ($elem, $attr) = $exp =~ m{(.*?)/?(@[^/]+)?$}; # "@attr" syntax is this module original.
+        my ($elem, $attr) = $exp =~ m{(.*?)/?(@[^/]+)?$}; # extends @attr syntax
         if ($elem) {
             $xpath = HTML::Selector::XPath::selector_to_xpath($elem);
             $xpath .= "/$attr" if $attr;
@@ -89,9 +90,9 @@ sub _query {
     }
 }
 
-sub _get_node_from {
+sub _to_node {
      my ($self, $xmlpart) = @_;
-     $self->{parser}->parse_string($xmlpart)->documentElement;
+     $self->{engine}{parser}->parse_string($xmlpart)->documentElement;
 }
 
 sub _assign_value {
@@ -103,6 +104,7 @@ sub _assign_value {
             $node->unbindNode;
         }
     }
+    
     elsif ($value_type eq 'HASH') { # => sub query
         for my $node (@$nodes) {
             if ($node->isa('XML::LibXML::Attr')) {
@@ -110,17 +112,18 @@ sub _assign_value {
                 last;
             }
             
-            my $fixed = { };
+            my $fixed_value = { };
             my $prefix_xpath = '/' . $node->nodeName;
             for my $exp (keys %$value) {
-                $fixed->{ $prefix_xpath . $self->_exp_to_xpath($exp) } = delete $value->{$exp};
+                $fixed_value->{ $prefix_xpath . $self->_exp_to_xpath($exp) } = delete $value->{$exp};
             }
              
-            my $part = $self->_get_node_from($node->serialize);
-            $self->_query($part, $fixed);
-            $node->replaceNode($part);
+            my $parted = $self->_to_node($node->serialize);
+            $self->_query($parted, $fixed_value);
+            $node->replaceNode($parted);
         }
     }
+    
     elsif ($value_type eq 'ARRAY' and ref($value->[0]) eq 'HASH') { # => sub query loop
         for my $node (@$nodes) {
             if ($node->isa('XML::LibXML::Attr')) {
@@ -131,7 +134,7 @@ sub _assign_value {
             my $container = XML::LibXML::DocumentFragment->new;
             my $joint;
             for my $v (@$value) {
-                my $tmpl = $self->_get_node_from($node->serialize);
+                my $tmpl = $self->_to_node($node->serialize);
                 $self->_query($tmpl, $v);
                 $container->addChild($joint->cloneNode) if $joint;
                 $container->addChild($tmpl);
@@ -144,14 +147,15 @@ sub _assign_value {
             $node->replaceNode($container);
         }
     }
+    
     elsif ($value_type eq 'ARRAY') { # => value, filter, filter, ...
         my ($value, @filters) = @$value;
         for my $filter (@filters) {
-            if ($filter and not ref($filter)) {
-                $filter = "Template::Semantic::Filter::$filter" unless $filter =~ /::/;
-                $filter = \&$filter;
+            if (not ref($filter) and my $f = $self->{engine}{filter}{$filter}) {
+                $filter = \&$f;
             }
         }
+        
         for my $node (@$nodes) {
             $self->_assign_value([$node], $value);
             
@@ -171,14 +175,21 @@ sub _assign_value {
             }
         }
     }
+    elsif (blessed($value) and $value->can('filter')) { # => filter callback
+        for my $node (@$nodes) {
+            my $ret = $value->filter($node->textContent);
+            $self->_assign_value([$node], $ret);
+        }
+    }
+    
     elsif ($value_type eq 'SCALAR') { # => as HTML/XML
-        my $root = $self->_get_node_from("<root>${$value}</root>");
+        my $root = $self->_to_node("<root>${$value}</root>");
         for my $node (@$nodes) {
             $node->removeChildNodes;
             $node->addChild( $_->cloneNode(1) ) for $root->childNodes;
         }
     }
-    elsif ($value_type and $value->isa('XML::LibXML::Node')) { # => as LibXML object
+    elsif (blessed($value) and $value->isa('XML::LibXML::Node')) { # => as LibXML object
         for my $node (@$nodes) {
             $node->removeChildNodes;
             $node->addChild( $value->cloneNode(1) );
