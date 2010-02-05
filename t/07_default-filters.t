@@ -1,20 +1,5 @@
-use strict;
-use warnings;
-use Test::Base; plan tests => 1 * blocks;
-
-use Template::Semantic;
-
-filters {
-    vars => [qw/ eval hash /],
-};
-
-my $ts = Template::Semantic->new;
-
-run {
-    my $block = shift;
-    my $doc = $ts->process(\$block->template, $block->vars);
-    is($doc->as_string, $block->expected, $block->name);
-};
+use t::TestBase;
+run_template_process;
 
 __DATA__
 === chomp 1
