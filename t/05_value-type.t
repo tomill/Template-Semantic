@@ -158,6 +158,30 @@ use XML::LibXML;
     <div><span><b>a</b><i>aaa</i></span></div>
 </root>
 
+=== elem x sub (using $_)
+--- vars
+'//span' => sub { uc }
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span>BAR</span>
+</root>
+
+=== attr x sub (using $_)
+--- vars
+'//span/@title' => sub { uc }
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span title="BAR">bar</span>
+</root>
+
 === elem x sub (using @_)
 --- vars
 '//span' => sub {
@@ -188,30 +212,6 @@ use XML::LibXML;
     <span title="XML::LibXML::Attr/title/bar">bar</span>
 </root>
 
-=== elem x sub (using $_)
---- vars
-'//span' => sub { uc }
---- template
-<root>
-    <span>bar</span>
-</root>
---- expected
-<root>
-    <span>BAR</span>
-</root>
-
-=== attr x sub (using $_)
---- vars
-'//span/@title' => sub { uc }
---- template
-<root>
-    <span title="bar">bar</span>
-</root>
---- expected
-<root>
-    <span title="BAR">bar</span>
-</root>
-
 === elem x sub (return undef)
 --- vars
 '//span' => sub { undef }
@@ -222,79 +222,6 @@ use XML::LibXML;
 --- expected
 <root>
     
-</root>
-
-=== attr x sub (return undef)
---- vars
-'//span/@title' => sub { undef }
---- template
-<root>
-    <span title="bar">bar</span>
-</root>
---- expected
-<root>
-    <span>bar</span>
-</root>
-
-=== elem x sub (return hashref)
---- vars
-'//div' => sub {
-    { 'span' => 'xxx' };
-}
---- template
-<root>
-    <div>
-        <img src="foo"/>
-        <span>bar</span>
-    </div>
-</root>
---- expected
-<root>
-    <div>
-        <img src="foo"/>
-        <span>xxx</span>
-    </div>
-</root>
-
-=== elem x sub (return arrayref)
---- vars
-'//div' => sub {
-    [
-        { 'span' => '001' },
-        { 'span' => '002' },
-    ]
-}
---- template
-<root>
-    <div>
-        <img src="foo"/>
-        <span>bar</span>
-    </div>
-</root>
---- expected
-<root>
-    <div>
-        <img src="foo"/>
-        <span>001</span>
-    </div>
-    <div>
-        <img src="foo"/>
-        <span>002</span>
-    </div>
-</root>
-
-=== elem x sub (using default filter)
---- vars
-'//span' => \&Template::Semantic::Filter::trim
---- template
-<root>
-    <span>  foo   </span>
-    <span> bar </span>
-</root>
---- expected
-<root>
-    <span>foo</span>
-    <span>bar</span>
 </root>
 
 === elem x unknown type
@@ -347,6 +274,26 @@ package main;
 <root>
     <div id="foo"><span>foo</span></div>
     <div id="bar"><span>xxx</span></div>
+</root>
+
+=== elem x arrayref of hashref list (simple)
+--- vars
+'ul.list li' => [
+    { '/li' => 'AAA'  },
+    { '/li' => 'BBB' },
+]
+--- template
+<root>
+    <ul class="list">
+        <li>xxx</li>
+    </ul>
+</root>
+--- expected
+<root>
+    <ul class="list">
+        <li>AAA</li>
+        <li>BBB</li>
+    </ul>
 </root>
 
 === elem x arrayref of hashref list
@@ -402,4 +349,77 @@ no warnings 'ambiguous'; # for Test::Base::Filter 'join'
 --- expected
 <root>
     <div id="foo" class="bar foo x-test-a x-test-b">foo</div>
+</root>
+
+=== attr x sub (return undef)
+--- vars
+'//span/@title' => sub { undef }
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span>bar</span>
+</root>
+
+=== elem x sub (return hashref)
+--- vars
+'//div' => sub {
+    { 'span' => 'xxx', 'img@src' => 'xxx.jpg' };
+}
+--- template
+<root>
+    <div>
+        <span>bar</span>
+        <img src="foo"/>
+    </div>
+</root>
+--- expected
+<root>
+    <div>
+        <span>xxx</span>
+        <img src="xxx.jpg"/>
+    </div>
+</root>
+
+=== elem x sub (return arrayref)
+--- vars
+'//div' => sub {
+    [
+        { 'span' => '001', 'img@src' => '001.jpg' },
+        { 'span' => '002', 'img@src' => '002.jpg' },
+    ]
+}
+--- template
+<root>
+    <div>
+        <span>bar</span>
+        <img src="foo"/>
+    </div>
+</root>
+--- expected
+<root>
+    <div>
+        <span>001</span>
+        <img src="001.jpg"/>
+    </div>
+    <div>
+        <span>002</span>
+        <img src="002.jpg"/>
+    </div>
+</root>
+
+=== elem x sub (using default filter)
+--- vars
+'//span' => \&Template::Semantic::Filter::trim
+--- template
+<root>
+    <span>  foo   </span>
+    <span> bar </span>
+</root>
+--- expected
+<root>
+    <span>foo</span>
+    <span>bar</span>
 </root>

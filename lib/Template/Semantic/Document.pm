@@ -10,15 +10,9 @@ use overload q{""} => sub { shift->as_string }, fallback => 1;
 
 sub new {
     my $class = shift;
-    my $self  = bless {
-        engine => "",
-        source => "",
-        dom    => "",
-        @_
-    }, $class;
+    my $self  = bless { @_ }, $class;
 
     my $source = $self->{source};
-    
     # quick hack for xhtml default ns
     $source =~ s{(<html[^>]+?)xmlns="http://www\.w3\.org/1999/xhtml"}{
         $self->{xmlns_hacked} = 1;
@@ -182,17 +176,17 @@ sub _assign_value {
         }
     }
     
+    elsif (blessed($value) and $value->isa('XML::LibXML::Node')) { # => as LibXML object
+        for my $node (@$nodes) {
+            $node->removeChildNodes;
+            $node->addChild( $value->cloneNode(1) );
+        }
+    }
     elsif ($value_type eq 'SCALAR') { # => as HTML/XML
         my $root = $self->_to_node("<root>${$value}</root>");
         for my $node (@$nodes) {
             $node->removeChildNodes;
             $node->addChild( $_->cloneNode(1) ) for $root->childNodes;
-        }
-    }
-    elsif (blessed($value) and $value->isa('XML::LibXML::Node')) { # => as LibXML object
-        for my $node (@$nodes) {
-            $node->removeChildNodes;
-            $node->addChild( $value->cloneNode(1) );
         }
     }
     else { # => text or unknown(stringify)

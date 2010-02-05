@@ -23,6 +23,14 @@ run {
 __DATA__
 === xpath
 --- vars
+'/html' => 'xxx'
+--- template
+<html>foo</html>
+--- expected
+<html>xxx</html>
+
+=== xpath
+--- vars
 '//title' => 'xxx'
 --- template
 <html>
@@ -329,3 +337,28 @@ __DATA__
     <div id="foo" title="xxx">foo</div>
 </html>
 
+=== css selector (attr)
+--- vars
+'div#foo/@title' => 'xxx'
+--- template
+<html>
+    <span id="foo">foo</span>
+    <div id="foo" title="foo">foo</div>
+</html>
+--- expected
+<html>
+    <span id="foo">foo</span>
+    <div id="foo" title="xxx">foo</div>
+</html>
+
+=== css selector (attr)
+--- vars
+'@title' => 'xxx'
+--- template
+<html title="foo">
+    <div id="foo" title="foo">foo</div>
+</html>
+--- expected
+<html title="xxx">
+    <div id="foo" title="xxx">foo</div>
+</html>
