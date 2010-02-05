@@ -39,25 +39,6 @@ subtest '$obj->process()' => sub {
     is($output, $expected);
 };
 
-subtest '$obj->process( optional params )' => sub {
-    plan tests => 1;
-    
-    use XML::LibXML;
-    my $ts = Template::Semantic->new(
-        parser => do {
-            my $parser = XML::LibXML->new;
-            $parser->no_network(1);
-            $parser->recover(0);
-            $parser;
-        },
-    );
-    
-    eval {
-        $ts->process(\'<root>&heart;</root>');
-    };
-    like($@, qr/Entity 'heart' not defined/);
-};
-
 subtest 'class->process()->process() chain' => sub {
     plan tests => 1;
     

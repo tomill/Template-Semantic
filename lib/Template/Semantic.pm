@@ -12,16 +12,21 @@ sub new {
     my $class = shift;
     my $self  = bless { @_ }, $class;
     
-    for (@Template::Semantic::Filter::EXPORT_OK) {
-        $self->define_filter($_ => \&{'Template::Semantic::Filter::' . $_});
-    }
+    $self->{libxml_options} = {
+        no_network => 1,
+        recover    => 2, # = recover_silently(1) = no warnings.
+        %{ $self->{libxml_options} || { } },
+    };
 
     $self->{parser} ||= do {
         my $parser = XML::LibXML->new;
-        $parser->no_network(1);
-        $parser->recover(2); # It's mean "no warnings".
+        $parser->$_($self->{libxml_options}{$_}) for keys %{ $self->{libxml_options} };
         $parser;
     };
+
+    for (@Template::Semantic::Filter::EXPORT_OK) {
+        $self->define_filter($_ => \&{'Template::Semantic::Filter::' . $_});
+    }
     
     $self;
 }
