@@ -81,3 +81,102 @@ __DATA__
     <foo>xxx</foo>
 </root>
 
+=== repeat block with whitespace 1
+--- vars
+'//div' => sub {
+    [
+        { 'span' => '001' },
+        { 'span' => '002' },
+        { 'span' => '003' },
+    ]
+}
+--- template
+<root>
+    <div>
+        <img src="foo"/>
+        <span>bar</span>
+    </div>
+</root>
+--- expected
+<root>
+    <div>
+        <img src="foo"/>
+        <span>001</span>
+    </div>
+    <div>
+        <img src="foo"/>
+        <span>002</span>
+    </div>
+    <div>
+        <img src="foo"/>
+        <span>003</span>
+    </div>
+</root>
+
+=== repeat block with whitespace 2
+--- vars
+'//div' => sub {
+    [
+        { 'span' => '001' },
+        { 'span' => '002' },
+        { 'span' => '003' },
+    ]
+}
+--- template
+<root>
+    
+    <div>
+        <img src="foo"/>
+        <span>bar</span>
+    </div>
+</root>
+--- expected
+<root>
+    
+    <div>
+        <img src="foo"/>
+        <span>001</span>
+    </div>
+    
+    <div>
+        <img src="foo"/>
+        <span>002</span>
+    </div>
+    
+    <div>
+        <img src="foo"/>
+        <span>003</span>
+    </div>
+</root>
+
+=== repeat block with whitespace 3
+--- vars
+'//div' => sub {
+    [
+        { 'span' => '001' },
+        { 'span' => '002' },
+        { 'span' => '003' },
+    ]
+}
+--- template
+<root>
+    test
+    <div>
+        <img src="foo"/>
+        <span>bar</span>
+    </div>
+</root>
+--- expected
+<root>
+    test
+    <div>
+        <img src="foo"/>
+        <span>001</span>
+    </div><div>
+        <img src="foo"/>
+        <span>002</span>
+    </div><div>
+        <img src="foo"/>
+        <span>003</span>
+    </div>
+</root>

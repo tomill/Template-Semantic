@@ -276,7 +276,8 @@ use XML::LibXML;
     <div>
         <img src="foo"/>
         <span>001</span>
-    </div><div>
+    </div>
+    <div>
         <img src="foo"/>
         <span>002</span>
     </div>
@@ -362,13 +363,6 @@ package main;
             <td>bar</td>
         </tr>
     </table>
-
-    <table class="dummy">
-        <tr>
-            <th>foo</th>
-            <td>bar</td>
-        </tr>
-    </table>
 </root>
 --- expected
 <root>
@@ -376,16 +370,10 @@ package main;
         <tr>
             <th>A</th>
             <td>001</td>
-        </tr><tr>
+        </tr>
+        <tr>
             <th>B</th>
             <td>002</td>
-        </tr>
-    </table>
-
-    <table class="dummy">
-        <tr>
-            <th>foo</th>
-            <td>bar</td>
         </tr>
     </table>
 </root>

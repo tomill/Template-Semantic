@@ -129,10 +129,17 @@ sub _assign_value {
             }
             
             my $container = XML::LibXML::DocumentFragment->new;
+            my $joint;
             for my $v (@$value) {
                 my $tmpl = $self->_get_node_from($node->serialize);
                 $self->_query($tmpl, $v);
+                $container->addChild($joint->cloneNode) if $joint;
                 $container->addChild($tmpl);
+                
+                if (not defined $joint) { # 2nd item
+                    my $p = $node->previousSibling;
+                    $joint = ($p and $p->serialize =~ /^(\W+)$/s) ? $p : "";
+                }
             }
             $node->replaceNode($container);
         }
