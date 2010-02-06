@@ -85,11 +85,6 @@ sub _query {
     }
 }
 
-sub _to_node {
-     my ($self, $xmlpart) = @_;
-     $self->{engine}{parser}->parse_string($xmlpart)->documentElement;
-}
-
 sub _assign_value {
     my ($self, $nodes, $value) = @_;
     my $value_type = ref $value;
@@ -161,7 +156,7 @@ sub _assign_value {
     }
     elsif ($value_type eq 'CODE') { # => callback
         for my $node (@$nodes) {
-            local $_ = $node->textContent;
+            local $_ = $self->_serialize_inner($node);
             my $ret = eval { $value->($node) };
             if ($@) {
                 croak "callback error: $@";
@@ -170,9 +165,9 @@ sub _assign_value {
             }
         }
     }
-    elsif (blessed($value) and $value->can('filter')) { # => filter callback
+    elsif (blessed($value) and $value->can('filter')) { # => Text::Pipe like filter
         for my $node (@$nodes) {
-            my $ret = $value->filter($node->textContent);
+            my $ret = $value->filter( $self->_serialize_inner($node) );
             $self->_assign_value([$node], $ret);
         }
     }
@@ -203,6 +198,22 @@ sub _assign_value {
             $node->addChild($value->cloneNode);
         }
     }
+}
+
+sub _to_node {
+     my ($self, $xmlpart) = @_;
+     $self->{engine}{parser}->parse_string($xmlpart)->documentElement;
+}
+
+sub _serialize_inner {
+    my ($self, $node) = @_;
+    my $inner = "";
+    if ($node->isa('XML::LibXML::Attr')) {
+        $inner = $node->value;
+    } else {
+        $inner .= $_->serialize for $node->childNodes;
+    }
+    $inner;
 }
 
 1;

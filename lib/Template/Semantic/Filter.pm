@@ -13,13 +13,6 @@ our @EXPORT_OK = qw(
     html_line_break
 );
 
-sub get_inner_html {
-    my $node = shift;
-    my $content = "";
-    $content .= $_->serialize for $node->childNodes;
-    $content;
-}
-
 sub chomp {
     chomp;
     $_;
@@ -47,9 +40,8 @@ sub comma {
 
 # from: Template::Filters
 sub html_line_break {
-    my $html = Template::Semantic::Filter::get_inner_html(shift);
-    $html =~ s!(\r?\n)!<br />$1!g;
-    \$html;
+    s!(\r?\n)!<br />$1!g;
+    \$_;
 }
 
 1;

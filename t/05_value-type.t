@@ -209,6 +209,30 @@ use XML::LibXML;
     
 </root>
 
+=== elem x sub (do nothing)
+--- vars
+'//span' => sub { \$_ }
+--- template
+<root>
+    <span>foo<b class="bar">bar</b></span>
+</root>
+--- expected
+<root>
+    <span>foo<b class="bar">bar</b></span>
+</root>
+
+=== attr x sub (do nothing)
+--- vars
+'span@class' => sub { \$_ }
+--- template
+<root>
+    <span class="xxx yyy zzz">foo</span>
+</root>
+--- expected
+<root>
+    <span class="xxx yyy zzz">foo</span>
+</root>
+
 === elem x Template::Semantic object 1
 --- vars
 '//div' => Template::Semantic->process(\'<span></span>', {
