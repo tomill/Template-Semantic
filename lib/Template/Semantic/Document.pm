@@ -34,7 +34,8 @@ sub as_string {
     if ($self->{source} =~ /^<\?xml/) {
         return $self->{dom}->serialize(1);
     }
-    else { # for skip <?xml declaration
+    else { # for skip <?xml declaration.
+           # I know html_parse_string->toString, but it doesn't do I want.
         my $r = "";
         if (my $dtd = $self->{dom}->internalSubset) {
             $r = $dtd->serialize . "\n";
@@ -180,6 +181,12 @@ sub _assign_value {
         for my $node (@$nodes) {
             $node->removeChildNodes;
             $node->addChild( $value->cloneNode(1) );
+        }
+    }
+    elsif (blessed($value) and $value->isa('Template::Semantic::Document')) { # => insert result
+        for my $node (@$nodes) {
+            $node->removeChildNodes;
+            $node->addChild( $_->cloneNode(1) ) for $value->{dom}->childNodes;
         }
     }
     elsif ($value_type eq 'SCALAR') { # => as HTML/XML

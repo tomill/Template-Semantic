@@ -209,6 +209,50 @@ use XML::LibXML;
     
 </root>
 
+=== elem x Template::Semantic object 1
+--- vars
+'//div' => Template::Semantic->process(\'<span></span>', {
+    'span' => 'xxx',
+})
+--- template
+<root>
+    <div></div>
+</root>
+--- expected
+<root>
+    <div><span>xxx</span></div>
+</root>
+
+=== elem x Template::Semantic object 2
+--- vars
+'//div' => Template::Semantic->process(\'<span></span>', {
+    'span' => 'xxx',
+})
+--- template
+<root>
+    <div></div>
+    <div></div>
+</root>
+--- expected
+<root>
+    <div><span>xxx</span></div>
+    <div><span>xxx</span></div>
+</root>
+
+=== elem x Template::Semantic object 3
+--- vars
+'//div' => Template::Semantic->process(\'<?xml version="1.0"?><span></span>', {
+    'span' => 'xxx',
+})
+--- template
+<root>
+    <div></div>
+</root>
+--- expected
+<root>
+    <div><span>xxx</span></div>
+</root>
+
 === elem x unknown type
 --- vars
 package Boo;
