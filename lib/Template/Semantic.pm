@@ -9,18 +9,15 @@ use Template::Semantic::Document;
 use Template::Semantic::Filter;
 
 sub new {
-    my $class = shift;
-    my $self  = bless { @_ }, $class;
-    
-    $self->{libxml_options} = {
-        no_network => 1,
-        recover    => 2, # = recover_silently(1) = no warnings.
-        %{ $self->{libxml_options} || { } },
-    };
+    my ($class, %opt) = @_;
+    my $self  = bless { }, $class;
 
+    $self->{parser} = delete $opt{parser};
     $self->{parser} ||= do {
         my $parser = XML::LibXML->new;
-        $parser->$_($self->{libxml_options}{$_}) for keys %{ $self->{libxml_options} };
+        $parser->no_network(1);
+        $parser->recover(2); # = recover_silently(1) = no warnings
+        $parser->$_($opt{$_}) for keys %opt;
         $parser;
     };
 

@@ -5,7 +5,7 @@ use Test::More;
 use Template::Semantic;
 use XML::LibXML;
 
-subtest 'default options' => sub {
+subtest 'using default options' => sub {
     plan tests => 1;
     
     my $ts = Template::Semantic->new;
@@ -16,14 +16,10 @@ subtest 'default options' => sub {
     ok(not $@);
 };
 
-subtest 'libxml_options => (custom)' => sub {
+subtest 'custom libxml options' => sub {
     plan tests => 1;
     
-    my $ts = Template::Semantic->new(
-        libxml_options => {
-            recover => 0,
-        },
-    );
+    my $ts = Template::Semantic->new( recover => 0 );
     
     eval {
         $ts->process(\'<root>&heart;</root>');
@@ -31,7 +27,7 @@ subtest 'libxml_options => (custom)' => sub {
     like($@, qr/Entity 'heart' not defined/);
 };
 
-subtest 'parser => (custom)' => sub {
+subtest 'custom parser' => sub {
     plan tests => 1;
     
     my $ts = Template::Semantic->new(
