@@ -48,5 +48,4 @@ subtest 'dynamic xinclude?' => sub {
     like($out, qr{<div class="bar">xxx</div>});
 };
 
-
 done_testing;

@@ -8,12 +8,12 @@ SYNOPSIS
           'title, h1' => 'Naoki Tomita',
           'ul.urls li' => [
               {
-                  'a' => 'Homepage >>',
+                  'a' => 'Homepage >',
                   'a@href' => 'http://e8y.net/',
                   'a@target' => undef,
               },
               {
-                  'a' => 'Twitter >>',
+                  'a' => 'Twitter >',
                   'a@href' => 'http://twitter.com/tomita/',
                   'a@target' => '_blank',
               },
@@ -39,24 +39,24 @@ SYNOPSIS
           <body>
               <h1>Naoki Tomita</h1>
               <ul class="urls">
-                  <li><a href="http://e8y.net/">Homepage &gt;&gt;</a></li>
-                  <li><a href="http://twitter.com/tomita/" targer="_blank">Twitter &gt;&gt;</a></li>
+                  <li><a href="http://e8y.net/">Homepage &gt;</a></li>
+                  <li><a href="http://twitter.com/tomita/" targer="_blank">Twitter &gt;</a></li>
               </ul>
           </body>
       </html>
 
 DESCRIPTION
-    Template::Semantic is a template engine for XHTML/XML that does't use
+    Template::Semantic is a template engine for XHTML/XML that doesn't use
     any template syntax. This module takes pure XHTML/XML as a template, and
     uses XPath or CSS selector to assign value.
 
-    This is beta release. Feedbacks are welcome.
+    This is beta release. Your feedback is welcome.
 
     See Template::Semantic::Cookbook for the practical examples.
 
 METHODS
     $ts = Template::Semantic->new( %options )
-        This method constructs a new "Template::Semantic" object.
+        Constructs a new "Template::Semantic" object.
 
           my $ts = Template::Semantic->new;
           my $out = $ts->process(...);
@@ -85,7 +85,8 @@ METHODS
         *   (others)
 
             All other parameters except "parser" are passed to XML parser
-            like "$parser->$key($value)".
+            like "$parser->$key($value)". See XML::LibXML::Parser for
+            details.
 
               my $ts = Template::Semantic->new(
                   recover => 1,
@@ -95,9 +96,9 @@ METHODS
     $out = $ts->process($filename, \%vars)
     $out = $ts->process(\$text, \%vars)
     $out = $ts->process(FH, \%vars)
-        Process a template and return Template::Semantic::Document object.
+        Process a template and returns Template::Semantic::Document object.
 
-        The first parameter is the input template that can take 3 types:
+        The 1st parameter is the input template that can take these types:
 
           # filename
           my $out = Tempalte::Semantic->('template.html', $vars);
@@ -109,14 +110,16 @@ METHODS
           my $out = Tempalte::Semantic->($fh, $vars);
           my $out = Tempalte::Semantic->(\*DATA, $vars);
 
-        The second parameter $vars is a value set to bind the template. This
-        should be hash-ref of 'selector' => $value, ... See below.
+        The 2nd parameter is a value set to bind the template. This should
+        be hash-ref like { 'selector' => $value, 'selector' => $value, ...
+        }. See below "SELECTOR" and "VALUE TYPE" section.
 
-    $ts->define_filter($filtername, \&code)
+    $ts->define_filter($filter_name, \&code)
+    $ts->call_filter($filter_name)
         See "Filter" section.
 
 SELECTOR
-    Use XPath expression or CSS selector as a selector (can be mixed).
+    Use XPath expression or CSS selector as a selector.
 
       print Tempalte::Semantic->process($template, {
       
@@ -156,8 +159,11 @@ VALUE TYPE
         *Scalar:* Replace the inner content with this as Text.
 
           $ts->process($template, {
-              'h1' => 'foo & bar',   # <h1></h1> => <h1>foo &amp; bar</h1>
-              '.foo@href' => '/foo', # <a href="#" class="foo">bar</a> => <a href="/foo" class="foo">bar</a>
+              'h1' => 'foo & bar',   # <h1></h1> =>
+                                     # <h1>foo &amp; bar</h1>
+       
+              '.foo@href' => '/foo', # <a href="#" class="foo">bar</a> =>
+                                     # <a href="/foo" class="foo">bar</a>
           });
 
     *   selector => \$html
@@ -166,7 +172,8 @@ VALUE TYPE
         XML/HTML.
 
           $ts->process($template, {
-              'h1' => \'<a href="#">foo</a>bar', # <h1></h1> => <h1><a href="#">foo</a>bar</h1>
+              'h1' => \'<a href="#">foo</a>bar', # <h1></h1> =>
+                                                 # <h1><a href="#">foo</a>bar</h1>
           });
 
     *   selector => undef
@@ -174,8 +181,11 @@ VALUE TYPE
         *undef:* Delete the element/attirbute that the selector indicates.
 
           $ts->process($template, {
-              'h1'            => undef, # => every <h1> disappear
-              'div.foo@class' => undef, # <div class="foo">foo</div> => <div>foo</div>
+              'h1'            => undef, # <div><h1></h1>foo</div> =>
+                                        # <div>foo</div>
+      
+              'div.foo@class' => undef, # <div class="foo">foo</div> =>
+                                        # <div>foo</div>
           });
 
     *   selector => \&foo
@@ -184,7 +194,7 @@ VALUE TYPE
         HTML or first argument as XML::LibXML::Node object.
 
           $ts->process($template, {
-              'h1' => sub { uc }, # <h1>foo</h1> => <h1>FOO</h1>
+              'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
               'h1' => sub {
                   my $node = shift;
                   $node->nodeName; # <h1>foo</h1> => <h1>h1</h1>
@@ -203,7 +213,7 @@ VALUE TYPE
 
         Replace the inner content by another "process()"-ed result.
 
-          $ts->process($template, {
+          $ts->process('wrapper.html', {
               'div#content' => $ts->process('inner.html', ...),
           });
 
@@ -212,29 +222,28 @@ VALUE TYPE
         *Hash-ref:* Sub query of the part.
 
           $ts->process($template, {
-              'div.header' => {
-                  'a' => undef, # => All <a> tag in <div class="header"> disappears
+              'div.foo' => {
+                  'a' => undef, # All <a> tag *in <div class="foo">* disappears
               },
-              # same as above
-              'div.header a' => undef,
+   
+              'div.foo a' => undef, # same as above
           });
 
   Loop
     *   selector => [ \%row, \%row, ... ]
 
         *Array-ref of Hash-refs:* Loop the part as template. Each item of
-        the arrey-ref should be hash-ref.
+        the array-ref should be hash-ref.
 
-          $ts->process($template, {
+          $ts->process(\*DATA, {
               'table.list tr' => [
                   { 'th' => 'aaa', 'td' => '001' },
                   { 'th' => 'bbb', 'td' => '002' },
                   { 'th' => 'ccc', 'td' => '003' },
               ],
           });
-
-        template:
-
+  
+          __DATA__
           <table class="list">
               <tr>
                   <td></td>
@@ -242,7 +251,7 @@ VALUE TYPE
               </tr>
           </table>
 
-        output:
+        Output:
 
           <table class="list">
               <tr>
@@ -260,40 +269,56 @@ VALUE TYPE
           </table>
 
   Filter
-    *   selector => [ $value, \&filter, 'filter', PIPE('foo'), ... ]
+    *   selector => [ $value, filter, filter, ... ]
 
-        *Array-ref of Scalars:* Value and filters. Filter can take A)
-        Callback subroutine or B) Defined filter name or C) Object like
-        Text::Pipe("it->can('filter')").
+        *Array-ref of Scalars:* Value and filters. Filter can take
+
+        A) Callback subroutine
+
+        B) Defined filter name
+
+        C) Object like Text::Pipe ("it->can('filter')")
 
           $ts->process($template, {
-              'h1' => [ 'foo', sub { uc }, sub { "$_!" } ], # <h1></h1> => <h1>FOO!</h1>
-              'h2' => [ ' foo ', 'trim', sub { "$_!" } ],   # <h2></h2> => <h2>FOO!</h2>
-              'h3' => [ 'foo', PIPE('UppercaseFirst') ],    # <h3></h3> => <h3>Foo</h3>
+              'h1' => [ 'foo', sub { uc }, sub { "$_!" } ], # => <h1>FOO!</h1>
+              'h2' => [ ' foo ', 'trim', sub { "$_!" } ],   # => <h2>FOO!</h2>
+              'h3' => [ 'foo', PIPE('UppercaseFirst') ],    # => <h3>Foo</h3>
           });
 
-        default filters
+        Defined basic filters
             Some basic filters included. See Template::Semantic::Filter.
 
-        define filter name
+        $ts->define_filter($filter_name, \&code)
             You can define the your filter name using "define_filter()".
 
-              $ts->define_filter(wow => sub { "$_!!!" })
+              use Text::Markdown qw/markdown/;
+              $ts->define_filter(markdown => sub { \ markdown($_) })
               $ts->process($template, {
-                  'h1' => [ 'foo', 'wow' ], # <h1></h1> => <h1>FOO!!!</h1>
+                  'div.content' => [ $text, 'markdown' ],
+              });
+
+        $code = $ts->call_filter($filter_name)
+            Accessor to defined filter.
+
+              $ts->process($template, {
+                  'div.entry'      => ...,
+                  'div.entry-more' => ...,
+              })->process({
+                  'div.entry, div.entry-more' => $ts->call_filter('markdown'),
               });
 
 SEE ALSO
-    Template::Semantic::Cookbook: for the practical examples.
+    Template::Semantic::Cookbook
 
     XML::LibXML, HTML::Selector::XPath
 
-    Template::Refine, Web::Scraper: got a lot of ideas. thanks!
+    I got a lot of ideas from Template, Template::Refine, Web::Scraper.
+    thanks!
 
 AUTHOR
     Naoki Tomita <tomita@cpan.org>
 
-    Feedbacks, patches, POD English check are always welcome!
+    Feedback, patches, POD English check are always welcome!
 
 LICENSE
     This library is free software; you can redistribute it and/or modify it
