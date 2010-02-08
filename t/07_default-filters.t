@@ -92,7 +92,7 @@ __DATA__
 === html_line_break
 --- vars
 'p' => [
-    qq{AAA\nBBB<br />BBB\n\nCCC\n},
+    qq{AAA&A\nBBB<br />BBB\n\nCCC\n},
     'html_line_break',
 ]
 --- template
@@ -101,7 +101,7 @@ __DATA__
 </root>
 --- expected
 <root>
-    <p>AAA<br/>
+    <p>AAA&amp;A<br/>
 BBB&lt;br /&gt;BBB<br/>
 <br/>
 CCC<br/>

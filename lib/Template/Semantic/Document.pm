@@ -227,19 +227,46 @@ Template::Semantic::Document - Template::Semantic Result object
 
 =head1 SYNOPSIS
 
-
-=head1 DESCRIPTION
-
+  my $out = Template::Semantic->process('template.html', {
+      'title, h1' => 'foo',
+  });
+  
+  print $out;
+  print $out->as_string; # same as avobe
+  
+  my $out = Template::Semantic->process('template.html', {
+      '.foo, .bar' => 'baz',
+      '.mee@class' => 'moo',
+  })->process({
+      '#boo@src' => 'grr',
+      '#yea .ye' => 'yoo',
+  })->process({
+      '.foo' => sub { uc },
+      '.bar' => sub { lc },
+  });
 
 =head1 METHODS
 
 =over 4
 
-=item ->process( \%vars )
+=item $out->as_string
 
-=item ->as_string
+Returns the result as XHTML/XML.
+
+=item "$out" (stringify)
+
+Calls C<as_string()> internally.
+
+=item $out = $out->process( \%vars )
+
+Process again to the result and returns L<Template::Semantic::Document> object
+again. So you can chain like C<< ->process(...)->process(...) >>.
 
 =back
+
+=head1 SEE ALSO
+
+L<Template::Semantic>
 
 =head1 AUTHOR
 

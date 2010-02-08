@@ -1,4 +1,30 @@
+=encoding utf-8
 
+=head1 NAME
+
+Template::Semantic::Cookbook - 
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+
+=head1 METHODS
+
+=over 4
+
+=item ->process( \%vars )
+
+=item ->as_string
+
+=back
+
+=head1 AUTHOR
+
+Naoki Tomita E<lt>tomita@cpan.orgE<gt>
+
+=cut
 wrapper みたいなのとか Text::MicroTemplate::Extended みたいなのやる工夫とか
 
 

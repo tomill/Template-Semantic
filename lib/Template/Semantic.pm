@@ -167,7 +167,7 @@ C<< $parser->$key($value) >>.
 
 =item $out = $ts->process(FH, \%vars)
 
-Process a template and return L<Template::Semantic::Document> object.
+Process a template and returns L<Template::Semantic::Document> object.
 
 The first parameter is the input template that can take 3 types:
 
@@ -308,7 +308,7 @@ I<Hash-ref:> Sub query of the part.
 
 =item * selector => [ \%row, \%row, ... ]
 
-I<Array-ref of Hash-refs:> Loop the part as template. Each item of the arrey-ref should be hash-ref.
+I<Array-ref of Hash-refs:> Loop the part as template. Each item of the array-ref should be hash-ref.
 
   $ts->process($template, {
       'table.list tr' => [
@@ -359,14 +359,14 @@ B) Defined filter name or
 C) Object like L<Text::Pipe>(C<< it->can('filter') >>).
 
   $ts->process($template, {
-      'h1' => [ 'foo', sub { uc }, sub { "$_!" } ], # <h1></h1> => <h1>FOO!</h1>
-      'h2' => [ ' foo ', 'trim', sub { "$_!" } ],   # <h2></h2> => <h2>FOO!</h2>
-      'h3' => [ 'foo', PIPE('UppercaseFirst') ],    # <h3></h3> => <h3>Foo</h3>
+      'h1' => [ 'foo', sub { uc }, sub { "$_!" } ], # => <h1>FOO!</h1>
+      'h2' => [ ' foo ', 'trim', sub { "$_!" } ],   # => <h2>FOO!</h2>
+      'h3' => [ 'foo', PIPE('UppercaseFirst') ],    # => <h3>Foo</h3>
   });
 
 =over 4
 
-=item default filters
+=item defined filters by default
 
 Some basic filters included. See L<Template::Semantic::Filter>.
 
