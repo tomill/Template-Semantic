@@ -116,7 +116,7 @@ __DATA__
     <span id="bar">bar</span>
 </html>
 
-=== xpath
+=== id()
 --- vars
 'id("foo")' => 'xxx'
 --- template
@@ -130,7 +130,7 @@ __DATA__
     <span id="bar">bar</span>
 </html>
 
-=== xpath (attr)
+=== id() (attr)
 --- vars
 'id("foo")/@title' => 'xxx'
 --- template
@@ -342,4 +342,32 @@ __DATA__
 --- expected
 <html title="xxx">
     <div id="foo" title="xxx">foo</div>
+</html>
+
+=== xpath (OR)
+--- vars
+'//title | //h1' => 'xxx'
+--- template
+<html>
+    <title></title>
+    <h1></h1>
+</html>
+--- expected
+<html>
+    <title>xxx</title>
+    <h1>xxx</h1>
+</html>
+
+=== css selector (OR)
+--- vars
+'title, h1' => 'xxx'
+--- template
+<html>
+    <title></title>
+    <h1></h1>
+</html>
+--- expected
+<html>
+    <title>xxx</title>
+    <h1>xxx</h1>
 </html>
