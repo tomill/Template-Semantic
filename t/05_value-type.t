@@ -4,7 +4,7 @@ run_template_process;
 __DATA__
 === elem x scalar
 --- vars
-'//span' => '<xxx>'
+'//span' => 'xxx > yyy'
 --- template
 <root>
     <div>
@@ -14,23 +14,7 @@ __DATA__
 --- expected
 <root>
     <div>
-        <span>&lt;xxx&gt;</span>
-    </div>
-</root>
-
-=== attr x scalar
---- vars
-'//span/@title' => '<xxx>'
---- template
-<root>
-    <div>
-        <span title="bar">bar</span>
-    </div>
-</root>
---- expected
-<root>
-    <div>
-        <span title="&lt;xxx&gt;">bar</span>
+        <span>xxx &gt; yyy</span>
     </div>
 </root>
 
@@ -50,22 +34,6 @@ __DATA__
     </div>
 </root>
 
-=== attr x undef
---- vars
-'//span/@title' => undef
---- template
-<root>
-    <div>
-        <span title="bar">bar</span>
-    </div>
-</root>
---- expected
-<root>
-    <div>
-        <span>bar</span>
-    </div>
-</root>
-
 === elem x scalarref
 --- vars
 '//span' => \'hey <b>you</b>!'
@@ -82,26 +50,10 @@ __DATA__
     </div>
 </root>
 
-=== attr x scalarref
---- vars
-'//span/@title' => \'xxx'
---- template
-<root>
-    <div>
-        <span title="bar">bar</span>
-    </div>
-</root>
---- expected
-<root>
-    <div>
-        <span title="xxx">bar</span>
-    </div>
-</root>
-
 === elem x XML::LibXML::Node (text node)
 --- vars
 use XML::LibXML;
-'//div' => XML::LibXML::Text->new('<xxx>')
+'//div' => XML::LibXML::Text->new('xxx > yyy')
 --- template
 <root>
     <div>bar</div>
@@ -109,23 +61,8 @@ use XML::LibXML;
 </root>
 --- expected
 <root>
-    <div>&lt;xxx&gt;</div>
-    <div>&lt;xxx&gt;</div>
-</root>
-
-=== attr x XML::LibXML::Node (text node)
---- vars
-use XML::LibXML;
-'//div/@title' => XML::LibXML::Text->new('<xxx>')
---- template
-<root>
-    <div title="foo">foo</div>
-    <div>bar</div>
-</root>
---- expected
-<root>
-    <div title="&lt;xxx&gt;">foo</div>
-    <div>bar</div>
+    <div>xxx &gt; yyy</div>
+    <div>xxx &gt; yyy</div>
 </root>
 
 === elem x XML::LibXML::Node (deep node)
@@ -155,18 +92,6 @@ use XML::LibXML;
     <span>BAR</span>
 </root>
 
-=== attr x sub (using $_)
---- vars
-'//span/@title' => sub { uc }
---- template
-<root>
-    <span title="bar">bar</span>
-</root>
---- expected
-<root>
-    <span title="BAR">bar</span>
-</root>
-
 === elem x sub (using @_)
 --- vars
 '//span' => sub {
@@ -184,7 +109,6 @@ use XML::LibXML;
 
 === elem x sub (add attr)
 --- vars
-use XML::LibXML;
 '//div' => sub {
     shift->setAttribute('class', 'foo');
     \$_;
@@ -196,21 +120,6 @@ use XML::LibXML;
 --- expected
 <root>
     <div class="foo"><span>bar</span></div>
-</root>
-
-=== attr x sub (using @_)
---- vars
-'//span/@title' => sub {
-    my $node = shift;
-    return ref($node) .'/'. $node->nodeName .'/'. $node->textContent;
-}
---- template
-<root>
-    <span title="bar">bar</span>
-</root>
---- expected
-<root>
-    <span title="XML::LibXML::Attr/title/bar">bar</span>
 </root>
 
 === elem x sub (return undef)
@@ -235,18 +144,6 @@ use XML::LibXML;
 --- expected
 <root>
     <span>foo<b class="bar">bar</b></span>
-</root>
-
-=== attr x sub (do nothing)
---- vars
-'span@class' => sub { \$_ }
---- template
-<root>
-    <span class="xxx yyy zzz">foo</span>
-</root>
---- expected
-<root>
-    <span class="xxx yyy zzz">foo</span>
 </root>
 
 === elem x Template::Semantic object 1
@@ -302,15 +199,11 @@ package main;
 '//span' => do { bless {}, 'Boo' };
 --- template
 <root>
-    <div>
-        <span>bar</span>
-    </div>
+    <span>bar</span>
 </root>
 --- expected
 <root>
-    <div>
-        <span>Booo!</span>
-    </div>
+    <span>Booo!</span>
 </root>
 
 === elem x hashref (xpath)
@@ -407,31 +300,6 @@ package main;
     <div id="foo">-100,000</div>
 </root>
 
-=== attr x arrayref (filters)
---- vars
-no warnings 'ambiguous'; # for Test::Base::Filter 'join'
-'id("foo")/@class' => [ sub { "x-test-b $_ x-test-a" }, sub { join " ", sort split } ]
---- template
-<root>
-    <div id="foo" class="foo bar">foo</div>
-</root>
---- expected
-<root>
-    <div id="foo" class="bar foo x-test-a x-test-b">foo</div>
-</root>
-
-=== attr x sub (return undef)
---- vars
-'//span/@title' => sub { undef }
---- template
-<root>
-    <span title="bar">bar</span>
-</root>
---- expected
-<root>
-    <span>bar</span>
-</root>
-
 === elem x sub (return hashref)
 --- vars
 '//div' => sub {
@@ -491,4 +359,377 @@ no warnings 'ambiguous'; # for Test::Base::Filter 'join'
 <root>
     <span>foo</span>
     <span>bar</span>
+</root>
+
+
+
+=== attr x scalar
+--- vars
+'//span/@title' => 'xxx > yyy'
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span title="xxx &gt; yyy">bar</span>
+</root>
+
+=== attr x undef
+--- vars
+'//span/@title' => undef
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span>bar</span>
+</root>
+
+=== attr x scalar-ref
+--- vars
+'//span/@title' => \'<b>xxx</b> > yyy'
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span title="xxx &gt; yyy">bar</span>
+</root>
+
+=== attr x XML::LibXML::Node
+--- vars
+use XML::LibXML;
+'//span/@title' => XML::LibXML::Text->new('xxx > yyy')
+--- template
+<root>
+    <span title="foo">foo</span>
+</root>
+--- expected
+<root>
+    <span title="xxx &gt; yyy">foo</span>
+</root>
+
+=== attr x arrayref (filters)
+--- vars
+no warnings 'ambiguous'; # for Test::Base::Filter 'join'
+'id("foo")/@class' => [ sub { "x-test-b $_ x-test-a" }, sub { join " ", sort split } ]
+--- template
+<root>
+    <span id="foo" class="foo bar">foo</span>
+</root>
+--- expected
+<root>
+    <span id="foo" class="bar foo x-test-a x-test-b">foo</span>
+</root>
+
+=== attr x sub (using $_)
+--- vars
+'//span/@title' => sub { uc }
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span title="BAR">bar</span>
+</root>
+
+=== attr x sub (using @_)
+--- vars
+'//span/@title' => sub {
+    my $node = shift;
+    return ref($node) .'/'. $node->nodeName .'/'. $node->textContent;
+}
+--- template
+<root>
+    <span title="bar">bar</span>
+</root>
+--- expected
+<root>
+    <span title="XML::LibXML::Attr/title/bar">bar</span>
+</root>
+
+=== attr x sub (do nothing)
+--- vars
+'span@class' => sub { \$_ }
+--- template
+<root>
+    <span class="xxx yyy zzz">foo</span>
+</root>
+--- expected
+<root>
+    <span class="xxx yyy zzz">foo</span>
+</root>
+
+
+
+=== text x scalar
+--- vars
+'//span/text()' => 'xxx > yyy'
+--- template
+<div>
+    <span>bar</span>
+</div>
+--- expected
+<div>
+    <span>xxx &gt; yyy</span>
+</div>
+
+=== text x undef
+--- vars
+'//span/text()' => undef
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span/>
+</root>
+
+=== text x scalar-ref
+--- vars
+'//span/text()' => \'<b>xxx</b> > yyy'
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span>xxx &gt; yyy</span>
+</root>
+
+=== text x XML::LibXML::Node
+--- vars
+use XML::LibXML;
+'//span/text()' => XML::LibXML::Text->new('xxx > yyy')
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span>xxx &gt; yyy</span>
+</root>
+
+=== text x sub (using $_)
+--- vars
+'//span/text()' => sub { uc }
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span>BAR</span>
+</root>
+
+=== text x sub (using @_)
+--- vars
+'//span/text()' => sub {
+    my $node = shift;
+    return ref($node) .'/'. $node->nodeName .'/'. $node->textContent;
+}
+--- template
+<root>
+    <span>bar</span>
+</root>
+--- expected
+<root>
+    <span>XML::LibXML::Text/#text/bar</span>
+</root>
+
+=== text x sub (do nothing)
+--- vars
+'//span/text()' => sub { \$_ }
+--- template
+<root>
+    <span>foo &amp; bar</span>
+</root>
+--- expected
+<root>
+    <span>foo &amp; bar</span>
+</root>
+
+
+
+=== comment x scalar
+--- vars
+'//comment()[1]' => 'xxx > yyy'
+--- template
+<div>
+    <!-- foo -->
+</div>
+--- expected
+<div>
+    <!--xxx > yyy-->
+</div>
+
+=== comment x undef
+--- vars
+'//comment()[1]' => undef
+--- template
+<root>
+    <!-- foo -->
+</root>
+--- expected
+<root>
+    
+</root>
+
+=== comment x scalar-ref
+--- vars
+'//comment()[1]' => \'<b>xxx</b> > yyy'
+--- template
+<root>
+    <!-- foo -->
+</root>
+--- expected
+<root>
+    <!--<b>xxx</b> > yyy-->
+</root>
+
+=== comment x XML::LibXML::Node
+--- vars
+use XML::LibXML;
+'//comment()[1]' => XML::LibXML::Text->new('xxx > yyy')
+--- template
+<root>
+    <!-- foo -->
+</root>
+--- expected
+<root>
+    <!--xxx > yyy-->
+</root>
+
+=== comment x sub (using $_)
+--- vars
+'//comment()[1]' => sub { uc }
+--- template
+<root>
+    <!-- foo > bar -->
+</root>
+--- expected
+<root>
+    <!-- FOO > BAR -->
+</root>
+
+=== comment x sub (using @_)
+--- vars
+'//comment()[1]' => sub {
+    my $node = shift;
+    return ref($node) .'/'. $node->nodeName .'/'. $node->textContent;
+}
+--- template
+<root>
+    <!-- foo -->
+</root>
+--- expected
+<root>
+    <!--XML::LibXML::Comment/#comment/ foo -->
+</root>
+
+=== comment x sub (do nothing)
+--- vars
+'//comment()[1]' => sub { \$_ }
+--- template
+<root>
+    <!-- foo > bar -->
+</root>
+--- expected
+<root>
+    <!-- foo > bar -->
+</root>
+
+
+
+=== cdata x scalar
+--- vars
+'//text()[2]' => 'xxx > yyy'
+--- template
+<div>
+    <![CDATA[ foo > bar ]]>
+</div>
+--- expected
+<div>
+    <![CDATA[xxx > yyy]]>
+</div>
+
+=== cdata x undef
+--- vars
+'//text()[2]' => undef
+--- template
+<root>
+    <![CDATA[ foo ]]>
+</root>
+--- expected
+<root>
+    
+</root>
+
+=== cdata x scalar-ref
+--- vars
+'//text()[2]' => \'<b>xxx</b> > yyy'
+--- template
+<root>
+    <![CDATA[ foo ]]>
+</root>
+--- expected
+<root>
+    <![CDATA[<b>xxx</b> > yyy]]>
+</root>
+
+=== cdata x XML::LibXML::Node
+--- vars
+use XML::LibXML;
+'//text()[2]' => XML::LibXML::Text->new('xxx > yyy')
+--- template
+<root>
+    <![CDATA[ foo ]]>
+</root>
+--- expected
+<root>
+    <![CDATA[xxx > yyy]]>
+</root>
+
+=== cdata x sub (using $_)
+--- vars
+'//text()[2]' => sub { uc }
+--- template
+<root>
+    <![CDATA[ foo > bar ]]>
+</root>
+--- expected
+<root>
+    <![CDATA[ FOO > BAR ]]>
+</root>
+
+=== cdata x sub (using @_)
+--- vars
+'//text()[2]' => sub {
+    my $node = shift;
+    return ref($node) .'/'. $node->nodeName .'/'. $node->textContent;
+}
+--- template
+<root>
+    <![CDATA[ foo ]]>
+</root>
+--- expected
+<root>
+    <![CDATA[XML::LibXML::CDATASection/#cdata-section/ foo ]]>
+</root>
+
+=== cdata x sub (do nothing)
+--- vars
+'//text()[2]' => sub { \$_ }
+--- template
+<root>
+    <![CDATA[ foo > bar ]]>
+</root>
+--- expected
+<root>
+    <![CDATA[ foo > bar ]]>
 </root>
