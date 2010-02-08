@@ -33,6 +33,11 @@ sub define_filter {
     $self->{filter}{$name} ||= $code;
 }
 
+sub call_filter {
+    my ($self, $name) = @_;
+    $self->{filter}{$name} or croak "filter $name not defined.";
+}
+
 sub process {
     my $self = ref $_[0] ? shift : shift->new;
     my ($template, $vars) = @_;
@@ -184,7 +189,9 @@ The first parameter is the input template that can take 3 types:
 The second parameter $vars is a value set to bind the template.
 This should be hash-ref of 'selector' => $value, ... See below.
 
-=item $ts->define_filter($filtername, \&code)
+=item $ts->define_filter($filter_name, \&code)
+
+=item $ts->call_filter($filter_name)
 
 See L</Filter> section.
 
@@ -283,7 +290,7 @@ Replace the inner content by the node.
 
 Replace the inner content by another C<process()>-ed result.
 
-  $ts->process($template, {
+  $ts->process('wrapper.html', {
       'div#content' => $ts->process('inner.html', ...),
   });
 
@@ -351,7 +358,7 @@ output:
 
 =over 4
 
-=item * selector => [ $value, \&filter, 'filter', PIPE('foo'), ... ]
+=item * selector => [ $value, filter, filter, ... ]
 
 I<Array-ref of Scalars:> Value and filters. Filter can take
 A) Callback subroutine or
@@ -366,17 +373,29 @@ C) Object like L<Text::Pipe>(C<< it->can('filter') >>).
 
 =over 4
 
-=item defined filters by default
+=item defined filters
 
 Some basic filters included. See L<Template::Semantic::Filter>.
 
-=item define filter name
+=item $ts->define_filter($filter_name, \&code)
 
 You can define the your filter name using C<define_filter()>.
-
-  $ts->define_filter(wow => sub { "$_!!!" })
+  
+  use Text::Markdown qw/markdown/;
+  $ts->define_filter(markdown => sub { \ markdown($_) })
   $ts->process($template, {
-      'h1' => [ 'foo', 'wow' ], # <h1></h1> => <h1>FOO!!!</h1>
+      'div.content' => [ $text, 'markdown' ],
+  });
+
+=item $code = $ts->call_filter($filter_name)
+
+Accessor to defined filter.
+
+  $ts->process($template, {
+      'div.entry' => "...",
+      'div.entry-more' => "...",
+  })->process({
+      'div.entry, div.entry-more' => $ts->call_filter('markdown'),
   });
 
 =back

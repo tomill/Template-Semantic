@@ -182,6 +182,22 @@ use XML::LibXML;
     <span>XML::LibXML::Element/span/bar</span>
 </root>
 
+=== elem x sub (add attr)
+--- vars
+use XML::LibXML;
+'//div' => sub {
+    shift->setAttribute('class', 'foo');
+    \$_;
+}
+--- template
+<root>
+    <div><span>bar</span></div>
+</root>
+--- expected
+<root>
+    <div class="foo"><span>bar</span></div>
+</root>
+
 === attr x sub (using @_)
 --- vars
 '//span/@title' => sub {

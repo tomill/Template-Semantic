@@ -20,6 +20,19 @@ subtest 'define_filter()' => sub {
     is($output, "<root>hello!!!</root>\n");
 };
 
+subtest 'call_filter()' => sub {
+    plan tests => 1;
+
+    my $ts = Template::Semantic->new;
+    $ts->define_filter(wow => sub { "$_!!!" });
+
+    my $output = $ts->process(\"<root>hello</root>\n", {
+        '/root' => $ts->call_filter('wow'),
+    });
+    
+    is($output, "<root>hello!!!</root>\n");
+};
+
 subtest 'define_filter() cannot overlide' => sub {
     plan tests => 1;
 

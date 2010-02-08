@@ -51,7 +51,7 @@ __DATA__
 
 === comma
 --- vars
-'price' => \&Template::Semantic::Filter::comma
+'price' => \&Template::Semantic::Filter::comma,
 --- template
 <root>
     <price>10000</price>

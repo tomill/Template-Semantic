@@ -143,8 +143,8 @@ sub _assign_value {
     elsif ($value_type eq 'ARRAY') { # => value, filter, filter, ...
         my ($value, @filters) = @$value;
         for my $filter (@filters) {
-            if (not ref($filter) and my $f = $self->{engine}{filter}{$filter}) {
-                $filter = \&$f;
+            if (not ref $filter) {
+                $filter = $self->{engine}->call_filter($filter);
             }
         }
         

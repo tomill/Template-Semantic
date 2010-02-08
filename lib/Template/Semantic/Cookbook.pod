@@ -1,30 +1,173 @@
-=encoding utf-8
-
 =head1 NAME
 
-Template::Semantic::Cookbook - 
+Template::Semantic::Cookbook - Template::Semantic Recipes
 
-=head1 SYNOPSIS
+=head1 RECIPES
+
+=head2 Zebra tables
+
+Use XPath power:
+
+  print Template::Semantic->($template, {
+      'table tbody tr' => [
+          { '//td[1]' => '101', '//td[2]' => '102' },
+          { '//td[1]' => '201', '//td[2]' => '202' },
+          { '//td[1]' => '301', '//td[2]' => '302' },
+          { '//td[1]' => '401', '//td[2]' => '402' },
+      ],
+  })->process({
+      '//table//tr[position() mod 2 = 0]/@class' => 'even',
+  });
+
+Template:
+
+  <table>
+      <thead>
+          <tr>
+              <th>Foo</th>
+              <th>Bar</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr class="">
+              <td>sample</td>
+              <td>sample</td>
+          </tr>
+      </tbody>
+  </table>
+
+Output:
+
+  <table>
+      <thead>
+          <tr>
+              <th>Foo</th>
+              <th>Bar</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr class="">
+              <td>101</td>
+              <td>102</td>
+          </tr>
+          <tr class="even">
+              <td>201</td>
+              <td>202</td>
+          </tr>
+          <tr class="">
+              <td>301</td>
+              <td>302</td>
+          </tr>
+          <tr class="even">
+              <td>401</td>
+              <td>402</td>
+          </tr>
+      </tbody>
+  </table>
 
 
-=head1 DESCRIPTION
+=head2 Add attribute
+
+The following example is output C<< <div>foo</div> >> because LibXML
+cannot find C<class> attribute in C<< <div> >>.
+
+  print Template::Semantic->(\'<div>foo</div>', {
+      'div@class' => 'foo',
+  });
+
+Solution:
+
+  print Template::Semantic->(\'<div>foo</div>', {
+      'div' => sub { shift->setAttribute(class => 'foo') \$_ },
+  });
+
+Or:
+
+  print Template::Semantic->(\'<div class="">foo</div>', {
+      'div@class' => 'foo',
+  });
 
 
-=head1 METHODS
+=head2 Remove dummy items
 
-=over 4
+Template (includs dummy items to check design):
 
-=item ->process( \%vars )
+  <ul>
+      <li>sample</li>
+      <li class="dummy">sample</li>
+      <li class="dummy">sample</li>
+      <li class="dummy">sample</li>
+  </ul>
 
-=item ->as_string
+Code:
 
-=back
+  print Template::Semantic->($template, {
+      '.dummy' => undef, # remove dummys first
+  })->process({
+      'ul li' => [
+          { '/li' => 'AAA' },
+          { '/li' => 'BBB' },
+          { '/li' => 'CCC' },
+          { '/li' => 'DDD' },
+      ],
+  });
+
+
+=head2 Remove indicater used only for Temlate::Semantic
+
+Use your own attribute:
+
+  <div>
+      <span data-id="foo">xxx</span>
+      <span data-id="bar">xxx</span>
+  </div>
+
+Code:
+
+  print Template::Semantic->($template, {
+      '//*[@data-id="foo"]' => 'foo',
+      '//*[@data-id="bar"]' => 'bar',
+  })->process({
+      '//@data-id' => undef,
+  });
+
+Output:
+
+  <div>
+      <span>foo</span>
+      <span>bar</span>
+  </div>
+
+
+=head2 Some custom filter ideas...
+
+Set output format in template:
+
+  print Template::Semantic->process(\*DATA, {
+      '.date' => sub {
+          my $date = localtime; # or DateTime->now
+          $date->strftime( shift->getAttribute('data-format') );
+      },
+  })->process({
+      '//@data-format' => undef,
+  });
+
+Template:
+
+  <div class="entry">
+      <div class="date" data-format="%Y/%m/%d">2010/99/99</div>
+  </div>
+
+Output:
+
+  <div class="entry">
+      <div class="date">2010/02/08</div>
+  </div>
+
 
 =head1 AUTHOR
 
 Naoki Tomita E<lt>tomita@cpan.orgE<gt>
 
 =cut
-wrapper みたいなのとか Text::MicroTemplate::Extended みたいなのやる工夫とか
-
 
