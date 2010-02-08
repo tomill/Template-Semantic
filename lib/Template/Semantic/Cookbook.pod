@@ -8,7 +8,7 @@ Template::Semantic::Cookbook - Template::Semantic Recipes
 
 Use XPath power:
 
-  print Template::Semantic->($template, {
+  print Template::Semantic->process(\*DATA, {
       'table tbody tr' => [
           { '//td[1]' => '101', '//td[2]' => '102' },
           { '//td[1]' => '201', '//td[2]' => '202' },
@@ -18,9 +18,8 @@ Use XPath power:
   })->process({
       '//table//tr[position() mod 2 = 0]/@class' => 'even',
   });
-
-Template:
-
+  
+  __DATA__
   <table>
       <thead>
           <tr>
@@ -65,32 +64,42 @@ Output:
       </tbody>
   </table>
 
+If you don't like C<class="">, do this.
+
+  print Template::Semantic->process(\*DATA, {
+      ...
+  )->process({
+      '//table//tr[position() mod 2 = 0]/@class' => 'even',
+      '//table//tr[position() mod 2 = 1]/@class' => undef,
+  });
+
 
 =head2 Add attribute
 
-The following example is output C<< <div>foo</div> >> because LibXML
-cannot find C<class> attribute in C<< <div> >>.
+The following example is output with NOT C<< <div class="foo">foo</div> >>
+like C<< <div>foo</div> >> because LibXML cannot find C<class> attribute
+in C<< <div> >>.
 
-  print Template::Semantic->(\'<div>foo</div>', {
+  print Template::Semantic->process(\'<div>foo</div>', {
       'div@class' => 'foo',
   });
 
 Solution:
 
-  print Template::Semantic->(\'<div>foo</div>', {
-      'div' => sub { shift->setAttribute(class => 'foo') \$_ },
+  print Template::Semantic->process(\'<div>foo</div>', {
+      'div' => sub { shift->setAttribute(class => 'foo'); \$_ },
   });
 
 Or:
 
-  print Template::Semantic->(\'<div class="">foo</div>', {
+  print Template::Semantic->process(\'<div class="">foo</div>', {
       'div@class' => 'foo',
   });
 
 
 =head2 Remove dummy items
 
-Template (includs dummy items to check design):
+Template (includes dummy items to check design):
 
   <ul>
       <li>sample</li>
@@ -101,7 +110,7 @@ Template (includs dummy items to check design):
 
 Code:
 
-  print Template::Semantic->($template, {
+  print Template::Semantic->process($template, {
       '.dummy' => undef, # remove dummys first
   })->process({
       'ul li' => [
@@ -113,29 +122,38 @@ Code:
   });
 
 
-=head2 Remove indicater used only for Temlate::Semantic
+=head2 Remove indicator used only for Temlate::Semantic
 
 Use your own attribute:
 
-  <div>
-      <span data-id="foo">xxx</span>
-      <span data-id="bar">xxx</span>
-  </div>
-
-Code:
-
-  print Template::Semantic->($template, {
+  print Template::Semantic->process(\*DATA, {
       '//*[@data-id="foo"]' => 'foo',
       '//*[@data-id="bar"]' => 'bar',
   })->process({
       '//@data-id' => undef,
   });
-
-Output:
-
+  
+  __DATA__
   <div>
-      <span>foo</span>
-      <span>bar</span>
+      <span data-id="foo">xxx</span>
+      <span data-id="bar">xxx</span>
+  </div>
+
+Or:
+
+  print Template::Semantic->process(\*DATA, {
+      '.x-foo' => 'foo',
+      '.x-bar' => 'bar',
+  })->process({
+      '//span[contains(@class,"x-")]/@class' => sub {
+          join " ", grep { !/^x-/ } split /\s+/;
+      },
+  });
+  
+  __DATA__
+  <div>
+      <span class="x-foo">xxx</span>
+      <span class="x-bar">xxx</span>
   </div>
 
 
@@ -151,9 +169,8 @@ Set output format in template:
   })->process({
       '//@data-format' => undef,
   });
-
-Template:
-
+  
+  __DATA__
   <div class="entry">
       <div class="date" data-format="%Y/%m/%d">2010/99/99</div>
   </div>
@@ -163,6 +180,36 @@ Output:
   <div class="entry">
       <div class="date">2010/02/08</div>
   </div>
+
+Another sample:
+
+  use Text::Markdown;
+  
+  my $ts = Template::Semantic->new;
+  $ts->define_filter(markdown => sub { \ Text::Markdown::markdown($_) });
+  
+  print $ts->process(\*DATA, {
+      'div.content' => sub {
+          $ts->call_filter( shift->getAttribute('data-format') );
+      },
+  })->process({
+      '//@data-format' => undef,
+  });
+  
+  __DATA__
+  <div class="container">
+      <div class="content" data-format="markdown">
+          *bla* bla bla
+      </div>
+      <div class="content" data-format="html_line_break">
+          bla bla bla
+      </div>
+  </div>
+
+
+=head1 Do you have another good usage?
+
+Blog it ;)
 
 
 =head1 AUTHOR
