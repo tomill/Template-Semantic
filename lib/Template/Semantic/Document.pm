@@ -124,6 +124,8 @@ sub _assign_value {
             my $container = XML::LibXML::DocumentFragment->new;
             my $joint;
             for my $v (@$value) {
+                next if ref($v) ne 'HASH';
+
                 my $tmpl = $self->_to_node($node->serialize);
                 $self->_query($tmpl, $v);
                 $container->addChild($joint->cloneNode) if $joint;
@@ -217,3 +219,30 @@ sub _serialize_inner {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Template::Semantic::Document - Template::Semantic Result object
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+
+=head1 METHODS
+
+=over 4
+
+=item ->process( \%vars )
+
+=item ->as_string
+
+=back
+
+=head1 AUTHOR
+
+Naoki Tomita E<lt>tomita@cpan.orgE<gt>
+
+=cut
