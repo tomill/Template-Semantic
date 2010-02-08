@@ -1,0 +1,21 @@
+? my $vars = $_[0];
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title><?= $vars->{title} ?></title>
+</head>
+<body>
+
+<h1><?= $vars->{title} ?></h1>
+
+<table>
+    <tr>
+? for my $item (@{ $vars->{list} || [] }) {
+        <td><?= $item->{name} ?></td>
+        <td><?= $item->{count} ?></td>
+? }
+    </tr>
+</table>
+
+</body>
+</html>
