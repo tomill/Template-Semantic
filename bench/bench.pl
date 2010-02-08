@@ -2,11 +2,12 @@ use strict;
 use warnings;
 use Benchmark;
 
-use Template;
+use HTML::Template;
 use Template::Semantic;
+use Template;
 use Text::MicroTemplate::File;
 
-Benchmark::cmpthese( Benchmark::timethese(1000, {
+Benchmark::cmpthese( -1, {
     'Template-Toolkit' => sub {
         my $tt = Template->new;
         $tt->process('bench/tt.html', {
@@ -30,6 +31,17 @@ Benchmark::cmpthese( Benchmark::timethese(1000, {
         });
         my $r = $out->as_string;
     },
+    
+    'HTML::Template' => sub {
+        my $ht = HTML::Template->new(filename => 'bench/ht.html');
+        $ht->param('title' => 'foo & bar');
+        $ht->param('list' => [
+                { 'name' => 'aaa', 'count' => '001' },
+                { 'name' => 'aaa', 'count' => '002' },
+                { 'name' => 'aaa', 'count' => '003' },
+        ]);
+        my $r = $ht->output;
+    },
 
     'Text::MicroTemplate' => sub {
         my $tm = Text::MicroTemplate::File->new;
@@ -43,4 +55,4 @@ Benchmark::cmpthese( Benchmark::timethese(1000, {
         });
         my $r = $out->as_string;
     },
-}));
+});
