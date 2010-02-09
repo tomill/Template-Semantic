@@ -23,6 +23,8 @@ sub new {
     $self;
 }
 
+sub dom { $_[0]->{dom} }
+
 sub process {
     my ($self, $vars) = @_;
     $self->_query($self->{dom}, $vars);
@@ -276,7 +278,7 @@ Template::Semantic::Document - Template::Semantic Result object
 
 =over 4
 
-=item $out->as_string
+=item $html = $out->as_string()
 
 Returns the result as XHTML/XML.
 
@@ -288,6 +290,14 @@ Calls C<as_string()> internally.
 
 Process again to the result and returns L<Template::Semantic::Document> object
 again. So you can chain like C<< ->process(...)->process(...) >>.
+
+=item $dom = $out->dom()
+
+  my $out  = Template::Semantic->process($template, ...);
+  my $dom  = $out->dom;
+  my $root = $dom->documentElement; # get root element
+
+Gets the result as L<XML::LibXML::Document>.
 
 =back
 

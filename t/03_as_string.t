@@ -18,24 +18,14 @@ my $expected = <<END
 END
 ;
 
-subtest 'overload q{""}' => sub {
-    plan tests => 1;
+my $output = Template::Semantic->process(\$input, {
+    'span' => 'HELLO WORLD',
+});
 
-    my $output = Template::Semantic->process(\$input, {
-        'span' => 'HELLO WORLD',
-    });
-    
-    is("$output", $expected);
-};
+isa_ok($output, 'Template::Semantic::Document');
+isa_ok($output->dom, 'XML::LibXML::Document', '->dom()');
 
-subtest '->as_string()' => sub {
-    plan tests => 1;
-
-    my $output = Template::Semantic->process(\$input, {
-        'span' => 'HELLO WORLD',
-    });
-    
-    is($output->as_string, $expected);
-};
+is("$output", $expected, 'overload q{""}');
+is($output->as_string, $expected, '->as_string()');
 
 done_testing;
