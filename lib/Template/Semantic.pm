@@ -430,6 +430,46 @@ Accessor to defined filter.
 =back
 
 
+=head1 COMMON MISTAKES
+
+The template should be XHTML/XML. Small errors might be no problem if using
+XML::LibXML's C<recover> option (This moudle sets C<recover(2)> by default).
+But plese take care these common mistakes.
+
+=over 4
+
+=item * Ampersand mark shouhd be C<&amp;>
+
+NG.
+
+  <a href="/?foo=&bar=">&</a>
+
+OK.
+
+  <a href="/?foo=&bar=">&amp</a>
+
+Note: values doesn't need escape.
+
+  $ts->process($template, {
+      'a'      => 'foo & bar',
+      'a@href' => '?foo=1&bar=2',
+  })
+
+=item * Template should have signle route element
+
+NG. libxml uses first part only.
+
+  <div>foo</div>
+  <div>bar</div>
+
+NG. libxml thinks this is the blank text.
+
+  foo
+  <div>bar</div>
+
+=back
+
+
 =head1 SEE ALSO
 
 L<Template::Semantic::Document>, L<Template::Semantic::Cookbook>
