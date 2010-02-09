@@ -274,19 +274,6 @@ I<undef:> Delete the element/attirbute that the selector indicates.
                                 # <div>foo</div>
   });
 
-=item * selector => \&foo
-
-I<Code-ref:> Callback subroutine. Subroutine can user C<$_> as inner HTML
-or first argument as L<XML::LibXML::Node> object.
-
-  $ts->process($template, {
-      'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
-      'h1' => sub {
-          my $node = shift;
-          $node->nodeName; # <h1>foo</h1> => <h1>h1</h1>
-      },
-  });
-
 =item * selector => XML::LibXML::Node
 
 Replace the inner content by the node.
@@ -363,6 +350,34 @@ Output:
 =back
 
 
+=head2 Callback
+
+=over 4
+
+=item * selector => \&foo
+
+I<Code-ref:> Callback subroutine. Subroutine can user C<$_> as inner HTML
+or first argument as L<XML::LibXML::Node> object. The value that subroutine
+returned is allocated by value type.
+
+  $ts->process($template, {
+      # samples
+      'h1' => sub { "bar" }, # <h1>foo</h1> => <h1>bar</h1>
+      'h1' => sub { undef }, # <h1>foo</h1> => disappears
+      
+      # sample: use $_
+      'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
+      
+      # sample: use arg
+      'h1' => sub {
+          my $node = shift;
+          $node->nodeName; # <h1>foo</h1> => <h1>h1</h1>
+      },
+  });
+
+=back
+
+
 =head2 Filter
 
 =over 4
@@ -417,7 +432,7 @@ Accessor to defined filter.
 
 =head1 SEE ALSO
 
-L<Template::Semantic::Cookbook>
+L<Template::Semantic::Document>, L<Template::Semantic::Cookbook>
 
 L<XML::LibXML>, L<HTML::Selector::XPath>
 

@@ -1,4 +1,7 @@
 Revision history for Perl extension Template::Semantic
 
+
+        - POD: Move callback basics to new callback section
+
 0.01  Mon Feb  8 22:58:01 JST 2010
         - original version
