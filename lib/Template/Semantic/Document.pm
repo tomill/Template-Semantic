@@ -212,7 +212,11 @@ sub _to_node {
 sub _replace_node {
     my ($self, $node, @replace) = @_;
     
-    if ($node->isa('XML::LibXML::Attr')) {
+    if ($node->isa('XML::LibXML::Element')) {
+        $node->removeChildNodes;
+        $node->addChild($_->cloneNode(1)) for @replace;
+    }
+    elsif ($node->isa('XML::LibXML::Attr')) {
         $node->setValue(join "", map { $_->textContent } @replace);
     }
     elsif ($node->isa('XML::LibXML::Comment')
@@ -221,10 +225,6 @@ sub _replace_node {
     }
     elsif ($node->isa('XML::LibXML::Text')) {
         $node->setData(join "",  map { $_->textContent } @replace);
-    }
-    else {
-        $node->removeChildNodes;
-        $node->addChild($_->cloneNode(1)) for @replace;
     }
 }
 

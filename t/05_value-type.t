@@ -1014,7 +1014,7 @@ use XML::LibXML;
 
 
 
-=== cdata scalar
+=== cdata x scalar
 --- vars
 '//text()[2]' => 'xxx > yyy'
 --- template
@@ -1202,4 +1202,155 @@ use XML::LibXML;
 <root>
     <![CDATA[BAR]]>
 </root>
+
+
+
+
+=== dom * scalar
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => 'xxx > yyy'
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x scalar-ref
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => \'<b>xxx</b> > yyy'
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x undef
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => undef
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x XML::LibXML::Element
+--- note: It is correct behavior to do nothing.
+--- vars
+use XML::LibXML;
+'/' => do {
+    my $elem = XML::LibXML::Element->new('span');
+    $elem->appendText('foo');
+    $elem;
+}
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x XML::LibXML::Text
+--- note: It is correct behavior to do nothing.
+--- vars
+use XML::LibXML;
+'/' => XML::LibXML::Text->new('xxx > yyy')
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x XML::LibXML::Attr
+--- vars
+use XML::LibXML;
+'/' => XML::LibXML::Attr->new('class', 'xxx')
+--- template
+<div>foo</div>
+--- error
+^Can't assign XML::LibXML::Attr to any element
+
+=== dom x XML::LibXML::Comment
+--- note: It is correct behavior to do nothing.
+--- vars
+use XML::LibXML;
+'/' => XML::LibXML::Comment->new('xxx')
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x XML::LibXML::CDATASection
+--- note: It is correct behavior to do nothing.
+--- vars
+use XML::LibXML;
+'/' => XML::LibXML::CDATASection->new('xxx')
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x Template::Semantic::Document
+--- vars
+'/' => Template::Semantic->process(\'<span></span>')
+--- template
+<div>foo</div>
+--- error
+^Can't assign Template::Semantic::Document to XML::LibXML::Document
+
+=== dom x hashref
+--- vars
+'/' => {
+    '/span' => 'xxx',
+}
+--- template
+<div>foo</div>
+--- error
+^Can't assign hashref to XML::LibXML::Document
+
+=== dom x list
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => [
+    { '/li' => 'AAA' },
+    { '/li' => 'BBB' },
+]
+--- template
+<div>foo</div>
+--- error
+^Can't assign loop list to XML::LibXML::Document
+
+=== dom x sub (using $_)
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => sub { uc }
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x sub (using @_)
+--- vars
+'/' => sub {
+    my $dom = shift;
+    die $dom->encoding;
+}
+--- template
+<?xml version="1.0" encoding="UTF-8"?>
+<div>foo</div>
+--- error
+^Callback error: UTF-8
+
+=== dom x sub (do nothing)
+--- vars
+'/' => sub { \$_ }
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
+
+=== dom x filter
+--- note: It is correct behavior to do nothing.
+--- vars
+'/' => [ ' bar ', sub { uc }, 'trim' ]
+--- template
+<div>foo</div>
+--- expected
+<div>foo</div>
 
