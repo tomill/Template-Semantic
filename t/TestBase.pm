@@ -12,23 +12,32 @@ sub run_template_process {
     plan tests => 1 * blocks;
     
     filters {
-        vars => [qw/ eval hash /],
+        vars  => [qw/ eval hash /],
+        error => [qw/ regexp /],
     };
 
     my $ts = Template::Semantic->new;
 
     run {
         my $block = shift;
-        my $doc = $ts->process(\$block->template, $block->vars);
         
-        my $name = $block->name;
-        if ($opt{selector_test}) {
-            my ($selector)
-                = $block->original_values->{vars} =~ /(.*?) =>/;
-            $name .= ": $selector";
+        my $out;
+        eval {
+            $out = $ts->process(\$block->template, $block->vars);
+        };
+        
+        if ($@) {
+            like($@, $block->error, $block->name);
+        } else {
+            my $name = $block->name;
+            if ($opt{selector_test}) {
+                my ($selector)
+                    = $block->original_values->{vars} =~ /(.*?) =>/;
+                $name .= ": $selector";
+            }
+            
+            is($out->as_string, $block->expected, $name);
         }
-        
-        is($doc->as_string, $block->expected, $name);
     };
 }
 

@@ -276,7 +276,7 @@ I<undef:> Delete the element/attirbute that the selector indicates.
 
 =item * selector => XML::LibXML::Node
 
-Replace the inner content by the node.
+Replace the inner content by the node. Note: XML::LibXML::Attr isn't supported.
 
   $ts->process($template, {
       'h1' => do { XML::LibXML::Text->new('foo') },

@@ -116,7 +116,7 @@ sub _assign_value {
     elsif ($value_type eq 'ARRAY' and ref($value->[0]) eq 'HASH') { # => sub query loop
         for my $node (@$nodes) {
             if (not $node->isa('XML::LibXML::Element')) {
-                croak "Can't assign arrayref of hashrefs to " . ref($node);
+                croak "Can't assign loop list to " . ref($node);
             }
             
             my $container = XML::LibXML::DocumentFragment->new;
@@ -175,9 +175,17 @@ sub _assign_value {
     elsif (blessed($value) and $value->isa('Template::Semantic::Document')) { # => insert result
         for my $node (@$nodes) {
             if (not $node->isa('XML::LibXML::Element')) {
-                croak "Can't assign Template::Semantic::Document object to " . ref($node);
+                croak "Can't assign Template::Semantic::Document to " . ref($node);
             }
             $self->_replace_node($node, $value->{dom}->childNodes);
+        }
+    }
+    elsif (blessed($value) and $value->isa('XML::LibXML::Node')) { # => as LibXML object
+        if ($value->isa('XML::LibXML::Attr')) {
+            croak "Can't assign XML::LibXML::Attr to any element";
+        }
+        for my $node (@$nodes) {
+            $self->_replace_node($node, $value);
         }
     }
     elsif ($value_type eq 'SCALAR') { # => as HTML/XML
@@ -186,17 +194,17 @@ sub _assign_value {
             $self->_replace_node($node, $root->childNodes);
         }
     }
-    elsif (blessed($value) and $value->isa('XML::LibXML::Node')) { # => as LibXML object
-        for my $node (@$nodes) {
-            $self->_replace_node($node, $value);
-        }
-    }
     else { # => text or unknown(stringify)
         my $value = XML::LibXML::Text->new("$value");
         for my $node (@$nodes) {
             $self->_replace_node($node, $value);
         }
     }
+}
+
+sub _to_node {
+     my ($self, $xmlpart) = @_;
+     $self->{engine}{parser}->parse_string($xmlpart)->documentElement;
 }
 
 sub _replace_node {
@@ -218,22 +226,20 @@ sub _replace_node {
     }
 }
 
-sub _to_node {
-     my ($self, $xmlpart) = @_;
-     $self->{engine}{parser}->parse_string($xmlpart)->documentElement;
-}
-
 sub _serialize_inner {
     my ($self, $node) = @_;
     my $inner = "";
     if ($node->isa('XML::LibXML::Attr')) {
         $inner = $node->value;
-    } elsif ($node->isa('XML::LibXML::Comment')
-          or $node->isa('XML::LibXML::CDATASection')) {
+    }
+    elsif ($node->isa('XML::LibXML::Comment')
+        or $node->isa('XML::LibXML::CDATASection')) {
         $inner = $node->data;
-    } elsif ($node->isa('XML::LibXML::Text')) {
+    }
+    elsif ($node->isa('XML::LibXML::Text')) {
         $inner = $node->serialize;
-    } else {
+    }
+    else {
         $inner .= $_->serialize for $node->childNodes;
     }
     $inner;
