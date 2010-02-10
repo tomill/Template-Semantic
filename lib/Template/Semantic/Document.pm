@@ -54,6 +54,20 @@ sub as_string {
     }
 }
 
+my $element_with_attr_regex = qr{
+    ^
+    \s*
+    (
+        \@[^@]+? |
+        (?:
+            (?: [^"]+? | .+?"[^"]+".+? )
+            (?: \@[^@]+? )?
+        )
+    )
+    \s*
+    (?: , | $ )
+}x;
+
 sub _exp_to_xpath {
     my ($self, $exp) = @_;
     return unless $exp;
@@ -64,14 +78,22 @@ sub _exp_to_xpath {
     } elsif ($exp =~ m{^id\(}) {
         $xpath = $exp;
         $xpath =~ s{^id\((.+?)\)}{//\*\[\@id=$1\]}g; # id() hack
-    } else { # css selector
-        my ($elem, $attr) = $exp =~ m{(.*?)/?(@[^/]+)?$}; # extends @attr syntax
-        if ($elem) {
-            $xpath = HTML::Selector::XPath::selector_to_xpath($elem);
-            $xpath .= "/$attr" if $attr;
-        } elsif ($attr) {
-            $xpath = "//$attr";
+    } else {
+        # css selector extends @attr syntax
+        my @x;
+        while ($exp =~ s/$element_with_attr_regex//) {
+            my $e = $1;
+            my ($elem, $attr) = $e =~ m{(.*?)/?(@[^/@]+)?$};
+            my $x;
+            if ($elem) {
+                my $x = HTML::Selector::XPath::selector_to_xpath($elem);
+                   $x .= "/$attr" if $attr;
+                push @x, $x;
+            } elsif ($attr) {
+                push @x, "//$attr";
+            }
         }
+        $xpath = join " | ", @x;
     }
     $xpath;
 }

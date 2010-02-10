@@ -183,7 +183,7 @@ The 1st parameter is the input template that can take these types:
   my $out = Template::Semantic->process($fh, $vars);
   my $out = Template::Semantic->process(\*DATA, $vars);
 
-The 2nd parameter is a value set to bind the template. This should be hash-ref
+The 2nd parameter is a value set to bind the template. $vars should be hash-ref
 like { 'selector' => $value, 'selector' => $value, ... }. See below
 L</SELECTOR> and L</VALUE TYPE> section.
 
@@ -202,24 +202,25 @@ Use XPath expression or CSS selector as a selector.
 
   print Template::Semantic->process($template, {
       
-      # XPath sample that indicate tag:
+      # XPath sample that indicate <tag>
       '/html/body/h2[2]' => ...,
       '//title | //h1'   => ...,
       '//img[@id="foo"]' => ...,
       'id("foo")'        => ...,
       
-      # XPath sample that indicate attribute:
+      # XPath sample that indicate @attr
       '//a[@id="foo"]/@href'              => ...,
       '//meta[@name="keywords"]/@content' => ...,
       
-      # CSS selector sample that indicate tag:
+      # CSS selector sample that indicate <tag>
       'title'         => ...,
       '.foo span.bar' => ...,
       '#foo'          => ...,
       
-      # CSS selector sample that indicate attribute:
+      # CSS selector sample that indicate @attr
       'img#foo@src'     => ...,
       'span.bar a@href' => ...,
+      '@alt, @title'    => ...,
   
   });
 
