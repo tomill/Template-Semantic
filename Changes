@@ -1,7 +1,13 @@
 Revision history for Perl extension Template::Semantic
 
-
-        - POD: Move callback basics to new callback section
+0.02  Wed Feb 10 18:33:17 JST 2010
+        - $out->as_string return fragment XHTML as XHTML. (thanks fujiwara-san)
+        - Auto fixes & => &amp; if recover > 0
+        - Add accessor $out->dom
+        - Support more CSS selector
+        - More examples
+        - More tests
+        - POD fixes (thanks Terrence Brannon)
 
 0.01  Mon Feb  8 22:58:01 JST 2010
         - original version
