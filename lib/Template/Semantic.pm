@@ -77,12 +77,10 @@ Template::Semantic - Use pure XHTML/XML as a template
           {
               'a' => 'Homepage >',
               'a@href' => 'http://e8y.net/',
-              'a@target' => undef,
           },
           {
               'a' => 'Twitter >',
               'a@href' => 'http://twitter.com/tomita/',
-              'a@target' => '_blank',
           },
       ],
   });
@@ -94,7 +92,7 @@ template:
       <body>
           <h1>person name</h1>
           <ul class="urls">
-              <li><a href="#" target="">his page</a></li>
+              <li><a href="#">his page</a></li>
           </ul>
       </body>
   </html>
@@ -107,20 +105,18 @@ output:
           <h1>Naoki Tomita</h1>
           <ul class="urls">
               <li><a href="http://e8y.net/">Homepage &gt;</a></li>
-              <li><a href="http://twitter.com/tomita/" targer="_blank">Twitter &gt;</a></li>
+              <li><a href="http://twitter.com/tomita/">Twitter &gt;</a></li>
           </ul>
       </body>
   </html>
 
 =head1 DESCRIPTION
 
-Template::Semantic is a template engine for XHTML/XML that doesn't use
-any template syntax. This module takes pure XHTML/XML as a template,
+Template::Semantic is a template engine for XHTML/XML based on L<XML::LibXML>
+that doesn't use any template syntax. This module takes pure XHTML/XML as a template,
 and uses XPath or CSS selector to assign value.
 
 B<This is beta release. Your feedback is welcome.>
-
-See L<Template::Semantic::Cookbook> for the practical examples.
 
 =head1 METHODS
 
@@ -178,14 +174,14 @@ Process a template and returns L<Template::Semantic::Document> object.
 The 1st parameter is the input template that can take these types:
 
   # filename
-  my $out = Tempalte::Semantic->('template.html', $vars);
+  my $out = Template::Semantic->process('template.html', $vars);
   
   # text reference
-  my $out = Tempalte::Semantic->(\'<html><body>foo</body></html>', $vars);
+  my $out = Template::Semantic->process(\'<html><body>foo</body></html>', $vars);
   
   # file handle
-  my $out = Tempalte::Semantic->($fh, $vars);
-  my $out = Tempalte::Semantic->(\*DATA, $vars);
+  my $out = Template::Semantic->process($fh, $vars);
+  my $out = Template::Semantic->process(\*DATA, $vars);
 
 The 2nd parameter is a value set to bind the template. This should be hash-ref
 like { 'selector' => $value, 'selector' => $value, ... }. See below
@@ -204,7 +200,7 @@ See L</Filter> section.
 
 Use XPath expression or CSS selector as a selector.
 
-  print Tempalte::Semantic->process($template, {
+  print Template::Semantic->process($template, {
       
       # XPath sample that indicate tag:
       '/html/body/h2[2]' => ...,
@@ -230,7 +226,7 @@ Use XPath expression or CSS selector as a selector.
 Note 1: CSS selector is converted to XPath internally. You can use '@attr'
 expression to indicate attribute in this module unlike CSS format.
 
-Note 2: You can use 'id()' function in XHTML (with C<html xmlns="...">)
+Note 2: You can use 'id()' function in XHTML (with C<< <html xmlns="..." >>)
 without using L<XML::LibXML::XPathContext>. This module sets C<xmlns="">
 namespace declarations automatically if template like a XHTML.
 
@@ -472,7 +468,9 @@ NG. libxml thinks this is the blank text.
 
 =head1 SEE ALSO
 
-L<Template::Semantic::Document>, L<Template::Semantic::Cookbook>
+L<Template::Semantic::Cookbook>
+
+L<Template::Semantic::Document>
 
 L<XML::LibXML>, L<HTML::Selector::XPath>
 
