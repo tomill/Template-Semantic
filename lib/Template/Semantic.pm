@@ -114,7 +114,7 @@ output:
 
 Template::Semantic is a template engine for XHTML/XML based on L<XML::LibXML>
 that doesn't use any template syntax. This module takes pure XHTML/XML as a template,
-and uses XPath or CSS selector to assign value.
+and uses XPath or CSS selectors to assign values.
 
 B<This is beta release. Your feedback is welcome.>
 
@@ -129,7 +129,8 @@ Constructs a new C<Template::Semantic> object.
   my $ts = Template::Semantic->new;
   my $out = $ts->process(...);
 
-If you do not want to change the options default, call C<process()> directly, skip C<new()>.
+If you do not want to change the options from the defaults, you may skip
+C<new()> and call C<process()> directly:
 
   my $out = Template::Semantic->process(...);
 
@@ -147,8 +148,9 @@ Set if you want to replace XML parser. It should be L<XML::LibXML> based.
 
 =item * (others)
 
-All other parameters except C<"parser"> are passed to XML parser like
-C<< $parser->$key($value) >>. Template::Semantic uses these config by default.
+All other parameters are applied to the XML parser as method calls (C<<
+$parser->$key($value) >>). Template::Semantic uses this configuration by
+default:
 
   no_newwork => 1  # faster
   recover    => 2  # "no warnings" style parser
@@ -169,9 +171,9 @@ See L<XML::LibXML::Parser/PARSER OPTIONS> for details.
 
 =item $out = $ts->process(FH, \%vars)
 
-Process a template and returns L<Template::Semantic::Document> object.
+Process a template and return a L<Template::Semantic::Document> object.
 
-The 1st parameter is the input template that can take these types:
+The first parameter is the input template, which may take one of several forms:
 
   # filename
   my $out = Template::Semantic->process('template.html', $vars);
@@ -183,15 +185,20 @@ The 1st parameter is the input template that can take these types:
   my $out = Template::Semantic->process($fh, $vars);
   my $out = Template::Semantic->process(\*DATA, $vars);
 
-The 2nd parameter is a value set to bind the template. $vars should be hash-ref
-like { 'selector' => $value, 'selector' => $value, ... }. See below
-L</SELECTOR> and L</VALUE TYPE> section.
+The second parameter is a value set to bind the template. $vars should be a
+hash-ref of selectors and corresponding values.  See the L</SELECTOR> and
+L</VALUE TYPE> sections below.  For example:
+
+  {
+    '.foo'    => 'hello',
+    '//title' => 'This is a title',
+  }
 
 =item $ts->define_filter($filter_name, \&code)
 
 =item $ts->call_filter($filter_name)
 
-See L</Filter> section.
+See the L</Filter> section.
 
 =back
 
@@ -224,12 +231,13 @@ Use XPath expression or CSS selector as a selector.
   
   });
 
-Note 1: CSS selector is converted to XPath internally. You can use '@attr'
-expression to indicate attribute in this module unlike CSS format.
+Note 1: CSS selectors are converted to XPath internally. You can use '@attr'
+in the selector to select a specific attribute to act on (unlike CSS, which
+only lets you select elements).
 
 Note 2: You can use 'id()' function in XHTML (with C<< <html xmlns="..." >>)
 without using L<XML::LibXML::XPathContext>. This module sets C<xmlns="">
-namespace declarations automatically if template like a XHTML.
+namespace declarations automatically if the template is like XHTML.
 
 
 =head1 VALUE TYPE
@@ -365,9 +373,10 @@ Output:
 
 =item * selector => \&foo
 
-I<Code-ref:> Callback subroutine. Subroutine can user C<$_> as inner HTML
-or first argument as L<XML::LibXML::Node> object. The value that subroutine
-returned is allocated by value type.
+I<Code-ref:> Callback subroutine.  The callback receives the inner HTML in
+C<$_> and an L<XML::LibXML::Node> object as the first argument.  Its return
+value is handled per this list of value types (scalar to replace content, undef
+to delete, etc.).
 
   $ts->process($template, {
       # samples
@@ -393,7 +402,7 @@ returned is allocated by value type.
 
 =item * selector => [ $value, filter, filter, ... ]
 
-I<Array-ref of Scalars:> Value and filters. Filter can take
+I<Array-ref of Scalars:> Value and filters. Filters may be
 
 A) Callback subroutine
 
@@ -415,7 +424,7 @@ Some basic filters included. See L<Template::Semantic::Filter>.
 
 =item $ts->define_filter($filter_name, \&code)
 
-You can define the your filter name using C<define_filter()>.
+You can define your own filters using C<define_filter()>.
 
   use Text::Markdown qw/markdown/;
   $ts->define_filter(markdown => sub { \ markdown($_) })
