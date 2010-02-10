@@ -5,16 +5,11 @@ use Test::More;
 use Template::Semantic;
 
 my $input = <<END
-<root>
+<div>
     <span>replace me</span>
-</root>
-END
-;
-
-my $expected = <<END
-<root>
-    <span>HELLO WORLD</span>
-</root>
+    <textarea></textarea>
+    <br/>
+</div>
 END
 ;
 
@@ -25,7 +20,29 @@ my $output = Template::Semantic->process(\$input, {
 isa_ok($output, 'Template::Semantic::Document');
 isa_ok($output->dom, 'XML::LibXML::Document', '->dom()');
 
-is("$output", $expected, 'overload q{""}');
-is($output->as_string, $expected, '->as_string()');
+my $expected_as_xhtml = <<END
+<div>
+    <span>HELLO WORLD</span>
+    <textarea></textarea>
+    <br />
+</div>
+END
+;
+
+is("$output", $expected_as_xhtml, 'overload q{""}');
+
+is($output->as_string, $expected_as_xhtml, '->as_string()');
+is($output->as_string(is_xhtml => 1), $expected_as_xhtml, '->as_string(is_xhtml => 1)');
+
+my $expected_as_xml = <<END
+<div>
+    <span>HELLO WORLD</span>
+    <textarea/>
+    <br/>
+</div>
+END
+;
+
+is($output->as_string(is_xhtml => 0), $expected_as_xml, '->as_string(is_xhtml => 0)');
 
 done_testing;

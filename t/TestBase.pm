@@ -8,7 +8,7 @@ use Template::Semantic;
 
 sub run_template_process {
     my %opt = @_;
-
+    
     plan tests => 1 * blocks;
     
     filters {
@@ -27,7 +27,11 @@ sub run_template_process {
         };
         
         if ($@) {
-            like($@, $block->error, $block->name);
+            if ($block->error) {
+                like($@, $block->error, $block->name);
+            } else {
+                is($@, "", $block->name);
+            }
         } else {
             my $name = $block->name;
             if ($opt{selector_test}) {

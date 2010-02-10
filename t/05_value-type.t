@@ -386,14 +386,14 @@ use XML::LibXML;
 <root>
     <div>
         <span>bar</span>
-        <img src="foo"/>
+        <img src="foo" />
     </div>
 </root>
 --- expected
 <root>
     <div>
         <span>xxx</span>
-        <img src="xxx.jpg"/>
+        <img src="xxx.jpg" />
     </div>
 </root>
 
@@ -409,18 +409,18 @@ use XML::LibXML;
 <root>
     <div>
         <span>bar</span>
-        <img src="foo"/>
+        <img src="foo" />
     </div>
 </root>
 --- expected
 <root>
     <div>
         <span>001</span>
-        <img src="001.jpg"/>
+        <img src="001.jpg" />
     </div>
     <div>
         <span>002</span>
-        <img src="002.jpg"/>
+        <img src="002.jpg" />
     </div>
 </root>
 
@@ -717,7 +717,7 @@ use XML::LibXML;
 </root>
 --- expected
 <root>
-    <span/>
+    <span></span>
 </root>
 
 === text x XML::LibXML::Element

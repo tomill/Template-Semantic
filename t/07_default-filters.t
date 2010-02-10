@@ -101,9 +101,9 @@ __DATA__
 </root>
 --- expected
 <root>
-    <p>AAA&amp;A<br/>
-BBB&lt;br /&gt;BBB<br/>
-<br/>
-CCC<br/>
+    <p>AAA&amp;A<br />
+BBB&lt;br /&gt;BBB<br />
+<br />
+CCC<br />
 </p>
 </root>

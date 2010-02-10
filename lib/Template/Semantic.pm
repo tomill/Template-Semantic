@@ -143,12 +143,12 @@ Set %options if you want to change parser options:
 
 =over 4
 
-=item * C<parser>
+=item * parser => $your_libxml_parser
 
 Set if you want to replace XML parser. It should be L<XML::LibXML> based.
 
   my $ts = Template::Semantic->new(
-      parser => $your_libxml_parser,
+      parser => My::LibXML->new,
   );
 
 =item * (others)
@@ -252,7 +252,7 @@ I<Scalar:> Replace the inner content with this as Text.
 
 =item * selector => \$html
 
-I<Scalar-ref:> Replace the inner content with this as flagment XML/HTML.
+I<Scalar-ref:> Replace the inner content with this as fragment XML/HTML.
 
   $ts->process($template, {
       'h1' => \'<a href="#">foo</a>bar', # <h1></h1> =>
@@ -442,12 +442,12 @@ Accessor to defined filter.
 =head1 COMMON MISTAKES
 
 The template should be XHTML/XML. Small errors might be no problem if using
-XML::LibXML's C<recover> option (This moudle sets C<recover(2)> by default).
-But plese take care these common mistakes.
+XML::LibXML's C<recover> option (This module sets C<recover(2)> by default).
+But please take care these common mistakes.
 
 =over 4
 
-=item * Ampersand mark shouhd be C<&amp;>
+=item * Ampersand mark should be C<&amp;>
 
 NG.
 
@@ -464,7 +464,7 @@ Note: values doesn't need escape.
       'a@href' => '?foo=1&bar=2',
   })
 
-=item * Template should have signle route element
+=item * Template should have single route element
 
 NG. libxml uses first part only.
 

@@ -32,24 +32,39 @@ sub process {
 }
 
 sub as_string {
-    my ($self) = @_;
+    my ($self, %opt) = @_;
+    
+    $opt{is_xhtml} = 1 unless defined $opt{is_xhtml};
+
     if ($self->{source} =~ /^<\?xml/) {
         return $self->{dom}->serialize(1);
     }
     else { # for skip <?xml declaration.
-           # I know html_parse_string->toString, but it doesn't do I want.
         my $r = "";
         if (my $dtd = $self->{dom}->internalSubset) {
             $r = $dtd->serialize . "\n";
+        } elsif($opt{is_xhtml}) {
+            $self->{dom}->createInternalSubset(
+                'html',
+                '-//W3C//DTD XHTML 1.0 Transitional//EN',
+                'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd',
+            );
+            $self->{dom_hacked}++;
         }
+
         if (my $root = $self->{dom}->documentElement) {
-            $r .= $root->serialize(1);
+            $r .= $root->serialize;
             $r =~ s/\n*$/\n/;
             
             if ($self->{xmlns_hacked}) {
                 $r =~ s{(<html[^>]+?)xmlns=""}{$1xmlns="http://www.w3.org/1999/xhtml"};
             }
         }
+        if ($self->{dom_hacked}) {
+            $self->{dom}->removeInternalSubset;
+            $self->{dom_hacked} = 0;
+        }
+        
         return $r;
     }
 }
@@ -276,9 +291,6 @@ Template::Semantic::Document - Template::Semantic Result object
       'title, h1' => 'foo',
   });
   
-  print $out;
-  print $out->as_string; # same as avobe
-  
   my $out = Template::Semantic->process('template.html', {
       '.foo, .bar' => 'baz',
       '.mee@class' => 'moo',
@@ -289,23 +301,60 @@ Template::Semantic::Document - Template::Semantic Result object
       '.foo' => sub { uc },
       '.bar' => sub { lc },
   });
+  
+  print $out;
+  print $out->as_string; # same as avobe
 
 =head1 METHODS
 
 =over 4
 
-=item $html = $out->as_string()
+=item $out = $out->process( \%vars )
 
-Returns the result as XHTML/XML.
+Process again to the result and returns L<Template::Semantic::Document>
+object again. So you can chain C<< ->process(...)->process(...) >>.
 
 =item "$out" (stringify)
 
 Calls C<as_string()> internally.
 
-=item $out = $out->process( \%vars )
+=item $html = $out->as_string( %options )
 
-Process again to the result and returns L<Template::Semantic::Document> object
-again. So you can chain like C<< ->process(...)->process(...) >>.
+Returns the result as XHTML/XML.
+
+=over 4
+
+=item * is_xhtml => [1|0]
+
+Default value is true. Even if DTD is not defined in the template, outputs as XHTML.
+When sets C<is_xhtml> false, skip this effect.
+
+  my $out = $ts->process(\<<END);
+  <div>
+      <img src="foo" />
+      <br />
+      <textarea></textarea>
+  </div>
+  END
+  ;
+  
+  print $out;
+  
+  <div>
+      <img src="foo" />
+      <br />
+      <textarea></textarea>
+  </div>
+  
+  print $out->as_string(is_xhtml => 0);
+  
+  <div>
+      <img src="foo"/>
+      <br/>
+      <textarea/>
+  </div>
+
+=back
 
 =item $dom = $out->dom()
 

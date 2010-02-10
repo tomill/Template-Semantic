@@ -4,370 +4,338 @@ run_template_process(selector_test => 1);
 __DATA__
 === xpath
 --- vars
-'/html' => 'xxx'
+'/div' => 'xxx'
 --- template
-<html>foo</html>
+<div>foo</div>
 --- expected
-<html>xxx</html>
+<div>xxx</div>
 
 === xpath
 --- vars
-'//title' => 'xxx'
+'//span' => 'xxx'
 --- template
-<html>
-<head><title>hello</title></head>
-</html>
+<div>
+<p><span>hello</span></p>
+</div>
 --- expected
-<html>
-<head><title>xxx</title></head>
-</html>
+<div>
+<p><span>xxx</span></p>
+</div>
 
 === xpath
 --- vars
-'/html/body/div/span' => 'xxx'
+'/div/div/span' => 'xxx'
 --- template
-<html>
-    <body>
-        <div class="foo">
-            <span>boo</span>
-        </div>
-        <form>
-            <span>boo</span>
-        </form>
-    </body>
-</html>
+<div>
+    <div class="foo">
+        <span>boo</span>
+    </div>
+    <form>
+        <span>boo</span>
+    </form>
+</div>
 --- expected
-<html>
-    <body>
-        <div class="foo">
-            <span>xxx</span>
-        </div>
-        <form>
-            <span>boo</span>
-        </form>
-    </body>
-</html>
+<div>
+    <div class="foo">
+        <span>xxx</span>
+    </div>
+    <form>
+        <span>boo</span>
+    </form>
+</div>
 
 === xpath
 --- vars
 '//h1' => 'xxx'
 --- template
-<html>
+<div>
 <h1>h1 -1</h1>
 <h1>h1 -2</h1>
-</html>
+</div>
 --- expected
-<html>
+<div>
 <h1>xxx</h1>
 <h1>xxx</h1>
-</html>
+</div>
 
 === xpath
 --- vars
 '//h1[2]' => 'xxx'
 --- template
-<html>
+<div>
 <h1>h1 -1</h1>
 <h1>h1 -2</h1>
-</html>
+</div>
 --- expected
-<html>
+<div>
 <h1>h1 -1</h1>
 <h1>xxx</h1>
-</html>
+</div>
 
 === xpath (attr)
 --- vars
-'//meta[1]/@content' => 'xxx'
+'//img[1]/@src' => 'xxx'
 --- template
-<html>
-<meta name="foo" content="foo"/>
-</html>
+<div>
+<img src="foo" />
+<img src="bar" />
+</div>
 --- expected
-<html>
-<meta name="foo" content="xxx"/>
-</html>
+<div>
+<img src="xxx" />
+<img src="bar" />
+</div>
 
 === xpath
 --- vars
 '//*[@class="bar"]' => 'xxx'
 --- template
-<html>
+<div>
     <span class="foo">foo</span>
     <span class="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span class="foo">foo</span>
     <span class="bar">xxx</span>
-</html>
+</div>
 
 === xpath
 --- vars
 '//*[@id="foo"]' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <span id="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">xxx</span>
     <span id="bar">bar</span>
-</html>
+</div>
 
 === id()
 --- vars
 'id("foo")' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <span id="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">xxx</span>
     <span id="bar">bar</span>
-</html>
+</div>
 
 === id() (attr)
 --- vars
 'id("foo")/@title' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo" title="foo">foo</span>
     <span id="bar" title="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo" title="xxx">foo</span>
     <span id="bar" title="bar">bar</span>
-</html>
+</div>
 
 === css selector
 --- vars
-'title' => 'xxx'
+'span' => 'xxx'
 --- template
-<html>
-<head><title>hello</title></head>
-</html>
+<div>
+<p><span>hello</span></p>
+</div>
 --- expected
-<html>
-<head><title>xxx</title></head>
-</html>
+<div>
+<p><span>xxx</span></p>
+</div>
 
 === css selector
 --- vars
-'html body div span' => 'xxx'
+'div div span' => 'xxx'
 --- template
-<html>
-    <body>
-        <div class="foo">
-            <span>boo</span>
-        </div>
-        <form>
-            <span>boo</span>
-        </form>
-    </body>
-</html>
+<div>
+    <div class="foo">
+        <span>boo</span>
+    </div>
+    <form>
+        <span>boo</span>
+    </form>
+</div>
 --- expected
-<html>
-    <body>
-        <div class="foo">
-            <span>xxx</span>
-        </div>
-        <form>
-            <span>boo</span>
-        </form>
-    </body>
-</html>
-
-=== css selector
---- vars
-'body span' => 'xxx'
---- template
-<html>
-    <body>
-        <div class="foo">
-            <span>boo</span>
-        </div>
-        <form>
-            <span>boo</span>
-        </form>
-    </body>
-</html>
---- expected
-<html>
-    <body>
-        <div class="foo">
-            <span>xxx</span>
-        </div>
-        <form>
-            <span>xxx</span>
-        </form>
-    </body>
-</html>
+<div>
+    <div class="foo">
+        <span>xxx</span>
+    </div>
+    <form>
+        <span>boo</span>
+    </form>
+</div>
 
 === css selector
 --- vars
 'h1' => 'xxx'
 --- template
-<html>
+<div>
 <h1>h1 -1</h1>
 <h1>h1 -2</h1>
-</html>
+</div>
 --- expected
-<html>
+<div>
 <h1>xxx</h1>
 <h1>xxx</h1>
-</html>
+</div>
 
 === css selector (attr)
 --- vars
-'meta@content' => 'xxx'
+'img@src' => 'xxx'
 --- template
-<html>
-<meta name="foo" content="foo"/>
-</html>
+<div>
+<img src="foo" />
+</div>
 --- expected
-<html>
-<meta name="foo" content="xxx"/>
-</html>
+<div>
+<img src="xxx" />
+</div>
 
 === css selector
 --- vars
 '.bar' => 'xxx'
 --- template
-<html>
+<div>
     <span class="foo">foo</span>
     <span class="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span class="foo">foo</span>
     <span class="bar">xxx</span>
-</html>
+</div>
 
 === css selector
 --- vars
 'span.bar' => 'xxx'
 --- template
-<html>
+<div>
     <span class="bar">bar</span>
     <div class="bar">bar</div>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span class="bar">xxx</span>
     <div class="bar">bar</div>
-</html>
+</div>
 
 === css selector (attr)
 --- vars
 'span.bar@title' => 'xxx'
 --- template
-<html>
+<div>
     <span class="foo" title="foo">foo</span>
     <span class="bar" title="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span class="foo" title="foo">foo</span>
     <span class="bar" title="xxx">bar</span>
-</html>
+</div>
 
 === css selector
 --- vars
 '#foo' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <span id="bar">bar</span>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">xxx</span>
     <span id="bar">bar</span>
-</html>
+</div>
 
 === css selector
 --- vars
 'div#foo' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo">foo</div>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo">xxx</div>
-</html>
+</div>
 
 === css selector (attr)
 --- vars
 'div#foo@title' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo" title="foo">foo</div>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo" title="xxx">foo</div>
-</html>
+</div>
 
 === css selector (attr)
 --- vars
 'div#foo/@title' => 'xxx'
 --- template
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo" title="foo">foo</div>
-</html>
+</div>
 --- expected
-<html>
+<div>
     <span id="foo">foo</span>
     <div id="foo" title="xxx">foo</div>
-</html>
+</div>
 
 === css selector (attr)
 --- vars
 '@title' => 'xxx'
 --- template
-<html title="foo">
+<div title="foo">
     <div id="foo" title="foo">foo</div>
-</html>
+</div>
 --- expected
-<html title="xxx">
+<div title="xxx">
     <div id="foo" title="xxx">foo</div>
-</html>
+</div>
 
 === xpath (OR)
 --- vars
-'//title | //h1' => 'xxx'
+'//span | //h1' => 'xxx'
 --- template
-<html>
-    <title></title>
+<div>
+    <span></span>
     <h1></h1>
-</html>
+</div>
 --- expected
-<html>
-    <title>xxx</title>
+<div>
+    <span>xxx</span>
     <h1>xxx</h1>
-</html>
+</div>
 
 === css selector (OR)
 --- vars
-'title, h1' => 'xxx'
+'span, h1' => 'xxx'
 --- template
-<html>
-    <title></title>
+<div>
+    <span></span>
     <h1></h1>
-</html>
+</div>
 --- expected
-<html>
-    <title>xxx</title>
+<div>
+    <span>xxx</span>
     <h1>xxx</h1>
-</html>
+</div>
