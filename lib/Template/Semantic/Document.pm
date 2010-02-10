@@ -19,6 +19,10 @@ sub new {
         $1 . 'xmlns=""';
     }e;
     
+    if ($self->{engine}{parser}->get_option('recover')) {
+        $source =~ s/&(?!\w+;|#(?:x[a-fA-F0-9]+|\d+);)/&amp;/g;
+    }
+
     $self->{dom} = $self->{engine}{parser}->parse_string($source);
     $self;
 }

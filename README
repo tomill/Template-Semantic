@@ -10,12 +10,10 @@ SYNOPSIS
               {
                   'a' => 'Homepage >',
                   'a@href' => 'http://e8y.net/',
-                  'a@target' => undef,
               },
               {
                   'a' => 'Twitter >',
                   'a@href' => 'http://twitter.com/tomita/',
-                  'a@target' => '_blank',
               },
           ],
       });
@@ -27,7 +25,7 @@ SYNOPSIS
           <body>
               <h1>person name</h1>
               <ul class="urls">
-                  <li><a href="#" target="">his page</a></li>
+                  <li><a href="#">his page</a></li>
               </ul>
           </body>
       </html>
@@ -40,19 +38,17 @@ SYNOPSIS
               <h1>Naoki Tomita</h1>
               <ul class="urls">
                   <li><a href="http://e8y.net/">Homepage &gt;</a></li>
-                  <li><a href="http://twitter.com/tomita/" targer="_blank">Twitter &gt;</a></li>
+                  <li><a href="http://twitter.com/tomita/">Twitter &gt;</a></li>
               </ul>
           </body>
       </html>
 
 DESCRIPTION
-    Template::Semantic is a template engine for XHTML/XML that doesn't use
-    any template syntax. This module takes pure XHTML/XML as a template, and
-    uses XPath or CSS selector to assign value.
+    Template::Semantic is a template engine for XHTML/XML based on
+    XML::LibXML that doesn't use any template syntax. This module takes pure
+    XHTML/XML as a template, and uses XPath or CSS selector to assign value.
 
     This is beta release. Your feedback is welcome.
-
-    See Template::Semantic::Cookbook for the practical examples.
 
 METHODS
     $ts = Template::Semantic->new( %options )
@@ -61,37 +57,38 @@ METHODS
           my $ts = Template::Semantic->new;
           my $out = $ts->process(...);
 
-        Template::Semantic uses XML::LibXML parser as follows by default.
-
-          my $parser = XML::LibXML->new;
-          $parser->no_newwork(1); # faster
-          $parser->recover(2);    # = recover_silently(1) = no warnings
-
-        If you may not change this, call "process()" directly, skip "new()".
+        If you do not want to change the options default, call "process()"
+        directly, skip "new()".
 
           my $out = Template::Semantic->process(...);
 
         Set %options if you want to change parser options:
 
-        *   "parser"
+        *   parser => $your_libxml_parser
 
             Set if you want to replace XML parser. It should be XML::LibXML
             based.
 
               my $ts = Template::Semantic->new(
-                  parser => $your_libxml_parser,
+                  parser => My::LibXML->new,
               );
 
         *   (others)
 
             All other parameters except "parser" are passed to XML parser
-            like "$parser->$key($value)". See XML::LibXML::Parser for
-            details.
+            like "$parser->$key($value)". Template::Semantic uses these
+            config by default.
 
-              my $ts = Template::Semantic->new(
-                  recover => 1,
-                  expand_xinclude => 1,
-              );
+              no_newwork => 1  # faster
+              recover    => 2  # "no warnings" style parser
+
+            See "PARSER OPTIONS" in XML::LibXML::Parser for details.
+
+              # "use strict;" style parser
+              my $ts = Template::Semantic->new( recover => 0 );
+  
+              # "use warnings;" style parser
+              my $ts = Template::Semantic->new( recover => 1 );
 
     $out = $ts->process($filename, \%vars)
     $out = $ts->process(\$text, \%vars)
@@ -101,16 +98,16 @@ METHODS
         The 1st parameter is the input template that can take these types:
 
           # filename
-          my $out = Tempalte::Semantic->('template.html', $vars);
+          my $out = Template::Semantic->process('template.html', $vars);
   
           # text reference
-          my $out = Tempalte::Semantic->(\'<html><body>foo</body></html>', $vars);
+          my $out = Template::Semantic->process(\'<html><body>foo</body></html>', $vars);
   
           # file handle
-          my $out = Tempalte::Semantic->($fh, $vars);
-          my $out = Tempalte::Semantic->(\*DATA, $vars);
+          my $out = Template::Semantic->process($fh, $vars);
+          my $out = Template::Semantic->process(\*DATA, $vars);
 
-        The 2nd parameter is a value set to bind the template. This should
+        The 2nd parameter is a value set to bind the template. $vars should
         be hash-ref like { 'selector' => $value, 'selector' => $value, ...
         }. See below "SELECTOR" and "VALUE TYPE" section.
 
@@ -121,26 +118,27 @@ METHODS
 SELECTOR
     Use XPath expression or CSS selector as a selector.
 
-      print Tempalte::Semantic->process($template, {
+      print Template::Semantic->process($template, {
       
-          # XPath sample that indicate tag:
+          # XPath sample that indicate <tag>
           '/html/body/h2[2]' => ...,
           '//title | //h1'   => ...,
           '//img[@id="foo"]' => ...,
           'id("foo")'        => ...,
       
-          # XPath sample that indicate attribute:
+          # XPath sample that indicate @attr
           '//a[@id="foo"]/@href'              => ...,
           '//meta[@name="keywords"]/@content' => ...,
       
-          # CSS selector sample that indicate tag:
+          # CSS selector sample that indicate <tag>
           'title'         => ...,
           '.foo span.bar' => ...,
           '#foo'          => ...,
       
-          # CSS selector sample that indicate attribute:
+          # CSS selector sample that indicate @attr
           'img#foo@src'     => ...,
           'span.bar a@href' => ...,
+          '@alt, @title'    => ...,
   
       });
 
@@ -148,7 +146,7 @@ SELECTOR
     '@attr' expression to indicate attribute in this module unlike CSS
     format.
 
-    Note 2: You can use 'id()' function in XHTML (with "html xmlns="..."")
+    Note 2: You can use 'id()' function in XHTML (with "<html xmlns="..."")
     without using XML::LibXML::XPathContext. This module sets "xmlns="""
     namespace declarations automatically if template like a XHTML.
 
@@ -168,7 +166,7 @@ VALUE TYPE
 
     *   selector => \$html
 
-        *Scalar-ref:* Replace the inner content with this as flagment
+        *Scalar-ref:* Replace the inner content with this as fragment
         XML/HTML.
 
           $ts->process($template, {
@@ -188,22 +186,10 @@ VALUE TYPE
                                         # <div>foo</div>
           });
 
-    *   selector => \&foo
-
-        *Code-ref:* Callback subroutine. Subroutine can user $_ as inner
-        HTML or first argument as XML::LibXML::Node object.
-
-          $ts->process($template, {
-              'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
-              'h1' => sub {
-                  my $node = shift;
-                  $node->nodeName; # <h1>foo</h1> => <h1>h1</h1>
-              },
-          });
-
     *   selector => XML::LibXML::Node
 
-        Replace the inner content by the node.
+        Replace the inner content by the node. Note: XML::LibXML::Attr isn't
+        supported.
 
           $ts->process($template, {
               'h1' => do { XML::LibXML::Text->new('foo') },
@@ -222,11 +208,23 @@ VALUE TYPE
         *Hash-ref:* Sub query of the part.
 
           $ts->process($template, {
+              # All <a> tag *in <div class="foo">* disappears
               'div.foo' => {
-                  'a' => undef, # All <a> tag *in <div class="foo">* disappears
+                  'a' => undef,
               },
-   
-              'div.foo a' => undef, # same as above
+  
+              # same as above
+              'div.foo a' => undef,
+  
+              # xpath '.' = current node (itself)
+              'a#bar' => {
+                  '.'       => 'foobar',
+                  './@href' => 'foo.html',
+              },
+      
+              # same as above
+              'a#bar'       => 'foobar',
+              'a#bar/@href' => 'foo.html',
           });
 
   Loop
@@ -267,6 +265,28 @@ VALUE TYPE
                   <td>003</td>
               </tr>
           </table>
+
+  Callback
+    *   selector => \&foo
+
+        *Code-ref:* Callback subroutine. Subroutine can user $_ as inner
+        HTML or first argument as XML::LibXML::Node object. The value that
+        subroutine returned is allocated by value type.
+
+          $ts->process($template, {
+              # samples
+              'h1' => sub { "bar" }, # <h1>foo</h1> => <h1>bar</h1>
+              'h1' => sub { undef }, # <h1>foo</h1> => disappears
+      
+              # sample: use $_
+              'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
+      
+              # sample: use arg
+              'h1' => sub {
+                  my $node = shift;
+                  $node->nodeName; # <h1>foo</h1> => <h1>h1</h1>
+              },
+          });
 
   Filter
     *   selector => [ $value, filter, filter, ... ]
@@ -309,6 +329,8 @@ VALUE TYPE
 
 SEE ALSO
     Template::Semantic::Cookbook
+
+    Template::Semantic::Document
 
     XML::LibXML, HTML::Selector::XPath
 

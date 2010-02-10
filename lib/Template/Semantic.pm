@@ -129,13 +129,7 @@ Constructs a new C<Template::Semantic> object.
   my $ts = Template::Semantic->new;
   my $out = $ts->process(...);
 
-Template::Semantic uses L<XML::LibXML> parser as follows by default.
-
-  my $parser = XML::LibXML->new;
-  $parser->no_newwork(1); # faster
-  $parser->recover(2);    # = recover_silently(1) = no warnings
-
-If you may not change this, call C<process()> directly, skip C<new()>.
+If you do not want to change the options default, call C<process()> directly, skip C<new()>.
 
   my $out = Template::Semantic->process(...);
 
@@ -154,12 +148,18 @@ Set if you want to replace XML parser. It should be L<XML::LibXML> based.
 =item * (others)
 
 All other parameters except C<"parser"> are passed to XML parser like
-C<< $parser->$key($value) >>. See L<XML::LibXML::Parser> for details.
+C<< $parser->$key($value) >>. Template::Semantic uses these config by default.
 
-  my $ts = Template::Semantic->new(
-      recover => 1,
-      expand_xinclude => 1,
-  );
+  no_newwork => 1  # faster
+  recover    => 2  # "no warnings" style parser
+
+See L<XML::LibXML::Parser/PARSER OPTIONS> for details.
+
+  # "use strict;" style parser
+  my $ts = Template::Semantic->new( recover => 0 );
+  
+  # "use warnings;" style parser
+  my $ts = Template::Semantic->new( recover => 1 );
 
 =back
 
@@ -435,46 +435,6 @@ Accessor to defined filter.
   });
 
 =back
-
-=back
-
-
-=head1 COMMON MISTAKES
-
-The template should be XHTML/XML. Small errors might be no problem if using
-XML::LibXML's C<recover> option (This module sets C<recover(2)> by default).
-But please take care these common mistakes.
-
-=over 4
-
-=item * Ampersand mark should be C<&amp;>
-
-NG.
-
-  <a href="/?foo=&bar=">&</a>
-
-OK.
-
-  <a href="/?foo=&bar=">&amp</a>
-
-Note: values doesn't need escape.
-
-  $ts->process($template, {
-      'a'      => 'foo & bar',
-      'a@href' => '?foo=1&bar=2',
-  })
-
-=item * Template should have single route element
-
-NG. libxml uses first part only.
-
-  <div>foo</div>
-  <div>bar</div>
-
-NG. libxml thinks this is the blank text.
-
-  foo
-  <div>bar</div>
 
 =back
 

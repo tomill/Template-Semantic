@@ -165,3 +165,10 @@ __DATA__
         <span>003</span>
     </div>
 </root>
+
+=== s/&/&amp;/ for "EntityRef: expecting ';'"
+--- vars
+--- template
+<a href="/?foo=&foo=">foo &amp; bar & baz</a>
+--- expected
+<a href="/?foo=&amp;foo=">foo &amp; bar &amp; baz</a>
