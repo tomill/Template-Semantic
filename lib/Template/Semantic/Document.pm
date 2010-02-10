@@ -59,7 +59,7 @@ sub _exp_to_xpath {
     return unless $exp;
     
     my $xpath;
-    if ($exp =~ m{^/}) {
+    if ($exp =~ m{^(?:/|\.(?:/|$))}) {
         $xpath = $exp;
     } elsif ($exp =~ m{^id\(}) {
         $xpath = $exp;
@@ -102,15 +102,9 @@ sub _assign_value {
             if (not $node->isa('XML::LibXML::Element')) {
                 croak "Can't assign hashref to " . ref($node);
             }
-            
-            my $fixed_value = { };
-            my $prefix_xpath = '/' . $node->nodeName;
-            for my $exp (keys %$value) {
-                $fixed_value->{ $prefix_xpath . $self->_exp_to_xpath($exp) } = delete $value->{$exp};
-            }
              
             my $parted = $self->_to_node($node->serialize);
-            $self->_query($parted, $fixed_value);
+            $self->_query($parted, $value);
             $node->replaceNode($parted);
         }
     }

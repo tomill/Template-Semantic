@@ -181,36 +181,48 @@ use XML::LibXML;
     <div><span>xxx</span></div>
 </root>
 
-=== elem x hashref (xpath)
---- vars
-'id("bar")' => {
-    '/span' => 'xxx',
-}
---- template
-<root>
-    <div id="foo"><span>foo</span></div>
-    <div id="bar"><span>bar</span></div>
-</root>
---- expected
-<root>
-    <div id="foo"><span>foo</span></div>
-    <div id="bar"><span>xxx</span></div>
-</root>
-
 === elem x hashref (css selector)
 --- vars
 'id("bar")' => {
-    'span' => 'xxx',
+    'span, .aaa' => 'xxx',
 }
 --- template
 <root>
-    <div id="foo"><span>foo</span></div>
-    <div id="bar"><span>bar</span></div>
+    <div id="foo">
+        <span>foo</span>
+        <b class="aaa">foo</b>
+    </div>
+    <div id="bar">
+        <span>bar</span>
+        <b class="aaa">bar</b>
+    </div>
 </root>
 --- expected
 <root>
-    <div id="foo"><span>foo</span></div>
-    <div id="bar"><span>xxx</span></div>
+    <div id="foo">
+        <span>foo</span>
+        <b class="aaa">foo</b>
+    </div>
+    <div id="bar">
+        <span>xxx</span>
+        <b class="aaa">xxx</b>
+    </div>
+</root>
+
+=== elem x hashref (xpath)
+--- vars
+'.foo' => {
+    '.'        => 'xxx',
+    './@class' => 'yyy',
+    './@href'  => 'zzz',
+}
+--- template
+<root>
+    <a href="" class="foo"></a>
+</root>
+--- expected
+<root>
+    <a href="zzz" class="yyy">xxx</a>
 </root>
 
 === elem x list (xpath)
@@ -261,6 +273,46 @@ use XML::LibXML;
         </tr>
     </table>
 </root>
+
+=== elem x list (nested)
+--- vars
+'ul li' => [
+    {
+        '.foo' => 'A',
+        'span' => [
+            { '.' => 'aaa' },
+            { '.' => 'aaa' },
+            { '.' => 'aaa' },
+        ],
+    },
+    {
+        '.foo' => 'B',
+        'span' => [
+            { '.' => 'bbb' },
+            { '.' => 'bbb' },
+            { '.' => 'bbb' },
+        ],
+    },
+]
+--- template
+<ul>
+    <li><div class="foo"></div>
+        <span></span>
+    </li>
+</ul>
+--- expected
+<ul>
+    <li><div class="foo">A</div>
+        <span>aaa</span>
+        <span>aaa</span>
+        <span>aaa</span>
+    </li>
+    <li><div class="foo">B</div>
+        <span>bbb</span>
+        <span>bbb</span>
+        <span>bbb</span>
+    </li>
+</ul>
 
 === elem x sub (return scalar)
 --- vars

@@ -289,13 +289,25 @@ Replace the inner content by another C<process()>-ed result.
 =item * selector => { 'selector' => $value, ... }
 
 I<Hash-ref:> Sub query of the part.
-  
+ 
   $ts->process($template, {
+      # All <a> tag *in <div class="foo">* disappears
       'div.foo' => {
-          'a' => undef, # All <a> tag *in <div class="foo">* disappears
+          'a' => undef,
       },
-   
-      'div.foo a' => undef, # same as above
+  
+      # same as above
+      'div.foo a' => undef,
+  
+      # xpath '.' = current node (itself)
+      'a#bar' => {
+          '.'       => 'foobar',
+          './@href' => 'foo.html',
+      },
+      
+      # same as above
+      'a#bar'       => 'foobar',
+      'a#bar/@href' => 'foo.html',
   });
 
 =back
