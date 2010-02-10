@@ -73,6 +73,21 @@ If you don't like C<class="">, do this.
       '//table//tr[position() mod 2 = 1]/@class' => undef,
   });
 
+=head2 For javascript
+
+If you want to set the value for JavaScript...
+
+  print $ts->process(\*DATA, {
+      'script[src="foo.js"]@src' => 'http://prod-server/foo.js',
+      '//script[2]' => 'var = ' . JSON::to_json($var_to_js),
+  });
+  __DATA__
+  <html>
+  <script type="text/javascript" src="foo.js"></script>
+  <script type="text/javascript"></script>
+  ...
+  </html>
+
 
 =head2 Add attribute
 
@@ -99,16 +114,16 @@ But I think that you should prepare place holder.
 
 =head2 Dummy items
 
-If template containsins dummy items to check design, you may delete them first.
+If template contains dummy items to check design, you may delete them first.
 
   print Template::Semantic->process(\*DATA, {
       '.dummy' => undef, # remove dummys first
   })->process({
       'ul li' => [
-          { '/li' => 'AAA' },
-          { '/li' => 'BBB' },
-          { '/li' => 'CCC' },
-          { '/li' => 'DDD' },
+          { '.' => 'AAA' },
+          { '.' => 'BBB' },
+          { '.' => 'CCC' },
+          { '.' => 'DDD' },
       ],
   });
   
@@ -123,7 +138,7 @@ If template containsins dummy items to check design, you may delete them first.
 
 =head2 Indicator only for Temlate::Semantic
 
-Idea 1 - Original C<data-id> attirubte:
+Idea 1 - Original C<data-id> attribute:
 
   print Template::Semantic->process(\*DATA, {
       '//*[@data-id="foo"]' => 'foo',
@@ -271,7 +286,7 @@ Output:
   </html>
 
 
-=head1 Do you have another good usage?
+=head2 Do you have another good usage?
 
 Blog it ;)
 
