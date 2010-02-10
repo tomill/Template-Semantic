@@ -39,7 +39,7 @@ sub as_string {
     my ($self, %opt) = @_;
     
     $opt{is_xhtml} = 1 unless defined $opt{is_xhtml};
-
+    
     if ($self->{source} =~ /^<\?xml/) {
         return $self->{dom}->serialize(1);
     }
@@ -55,7 +55,7 @@ sub as_string {
             );
             $self->{dom_hacked}++;
         }
-
+        
         if (my $root = $self->{dom}->documentElement) {
             $r .= $root->serialize;
             $r =~ s/\n*$/\n/;
@@ -160,7 +160,7 @@ sub _assign_value {
             my $joint;
             for my $v (@$value) {
                 next if ref($v) ne 'HASH';
-
+                
                 my $tmpl = $self->_to_node($node->serialize);
                 $self->_query($tmpl, $v);
                 $container->addChild($joint->cloneNode) if $joint;
@@ -316,7 +316,9 @@ Template::Semantic::Document - Template::Semantic Result object
 =item $out = $out->process( \%vars )
 
 Process again to the result and returns L<Template::Semantic::Document>
-object again. So you can chain C<< ->process(...)->process(...) >>.
+object again. So you can chain
+
+  Template::Semantic->process(...)->process(...)
 
 =item "$out" (stringify)
 

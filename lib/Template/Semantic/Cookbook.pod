@@ -124,6 +124,7 @@ If template contains dummy items to check design, you may delete them first.
           { '.' => 'BBB' },
           { '.' => 'CCC' },
           { '.' => 'DDD' },
+          { '.' => 'EEE' },
       ],
   });
   
@@ -133,6 +134,16 @@ If template contains dummy items to check design, you may delete them first.
       <li class="dummy">sample</li>
       <li class="dummy">sample</li>
       <li class="dummy">sample</li>
+  </ul>
+
+Output:
+
+  <ul>
+      <li>AAA</li>
+      <li>BBB</li>
+      <li>CCC</li>
+      <li>DDD</li>
+      <li>EEE</li>
   </ul>
 
 

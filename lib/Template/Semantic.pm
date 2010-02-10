@@ -20,7 +20,7 @@ sub new {
         $parser->$_($opt{$_}) for keys %opt;
         $parser;
     };
-
+    
     for (@Template::Semantic::Filter::EXPORT_OK) {
         $self->define_filter($_ => \&{'Template::Semantic::Filter::' . $_});
     }
@@ -272,8 +272,8 @@ I<Scalar-ref:> Replace the inner content with this as fragment XML/HTML.
 I<undef:> Delete the element/attirbute that the selector indicates.
 
   $ts->process($template, {
-      'h1'            => undef, # <div><h1></h1>foo</div> =>
-                                # <div>foo</div>
+      'h1'            => undef, # <div><h1>foo</h1>bar</div> =>
+                                # <div>bar</div>
       
       'div.foo@class' => undef, # <div class="foo">foo</div> =>
                                 # <div>foo</div>
@@ -404,7 +404,7 @@ to delete, etc.).
 
 I<Array-ref of Scalars:> Value and filters. Filters may be
 
-A) Callback subroutine
+A) Callback subroutine (code reference)
 
 B) Defined filter name
 
