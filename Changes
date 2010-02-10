@@ -1,5 +1,8 @@
 Revision history for Perl extension Template::Semantic
 
+0.03 Thu Feb 11 03:09:48 JST 2010
+        - POD fixes only (thanks Hans Dieter Pearcey)
+
 0.02  Wed Feb 10 18:33:17 JST 2010
         - $out->as_string return fragment XHTML as XHTML. (thanks fujiwara-san)
         - Auto fixes & => &amp; if recover > 0

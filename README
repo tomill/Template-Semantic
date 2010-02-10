@@ -46,7 +46,8 @@ SYNOPSIS
 DESCRIPTION
     Template::Semantic is a template engine for XHTML/XML based on
     XML::LibXML that doesn't use any template syntax. This module takes pure
-    XHTML/XML as a template, and uses XPath or CSS selector to assign value.
+    XHTML/XML as a template, and uses XPath or CSS selectors to assign
+    values.
 
     This is beta release. Your feedback is welcome.
 
@@ -57,8 +58,8 @@ METHODS
           my $ts = Template::Semantic->new;
           my $out = $ts->process(...);
 
-        If you do not want to change the options default, call "process()"
-        directly, skip "new()".
+        If you do not want to change the options from the defaults, you may
+        skip "new()" and call "process()" directly:
 
           my $out = Template::Semantic->process(...);
 
@@ -75,9 +76,9 @@ METHODS
 
         *   (others)
 
-            All other parameters except "parser" are passed to XML parser
-            like "$parser->$key($value)". Template::Semantic uses these
-            config by default.
+            All other parameters are applied to the XML parser as method
+            calls ("$parser->$key($value)"). Template::Semantic uses this
+            configuration by default:
 
               no_newwork => 1  # faster
               recover    => 2  # "no warnings" style parser
@@ -93,9 +94,10 @@ METHODS
     $out = $ts->process($filename, \%vars)
     $out = $ts->process(\$text, \%vars)
     $out = $ts->process(FH, \%vars)
-        Process a template and returns Template::Semantic::Document object.
+        Process a template and return a Template::Semantic::Document object.
 
-        The 1st parameter is the input template that can take these types:
+        The first parameter is the input template, which may take one of
+        several forms:
 
           # filename
           my $out = Template::Semantic->process('template.html', $vars);
@@ -107,13 +109,18 @@ METHODS
           my $out = Template::Semantic->process($fh, $vars);
           my $out = Template::Semantic->process(\*DATA, $vars);
 
-        The 2nd parameter is a value set to bind the template. $vars should
-        be hash-ref like { 'selector' => $value, 'selector' => $value, ...
-        }. See below "SELECTOR" and "VALUE TYPE" section.
+        The second parameter is a value set to bind the template. $vars
+        should be a hash-ref of selectors and corresponding values. See the
+        "SELECTOR" and "VALUE TYPE" sections below. For example:
+
+          {
+            '.foo'    => 'hello',
+            '//title' => 'This is a title',
+          }
 
     $ts->define_filter($filter_name, \&code)
     $ts->call_filter($filter_name)
-        See "Filter" section.
+        See the "Filter" section.
 
 SELECTOR
     Use XPath expression or CSS selector as a selector.
@@ -142,13 +149,13 @@ SELECTOR
   
       });
 
-    Note 1: CSS selector is converted to XPath internally. You can use
-    '@attr' expression to indicate attribute in this module unlike CSS
-    format.
+    Note 1: CSS selectors are converted to XPath internally. You can use
+    '@attr' in the selector to select a specific attribute to act on (unlike
+    CSS, which only lets you select elements).
 
     Note 2: You can use 'id()' function in XHTML (with "<html xmlns="..."")
     without using XML::LibXML::XPathContext. This module sets "xmlns="""
-    namespace declarations automatically if template like a XHTML.
+    namespace declarations automatically if the template is like XHTML.
 
 VALUE TYPE
   Basics
@@ -179,8 +186,8 @@ VALUE TYPE
         *undef:* Delete the element/attirbute that the selector indicates.
 
           $ts->process($template, {
-              'h1'            => undef, # <div><h1></h1>foo</div> =>
-                                        # <div>foo</div>
+              'h1'            => undef, # <div><h1>foo</h1>bar</div> =>
+                                        # <div>bar</div>
       
               'div.foo@class' => undef, # <div class="foo">foo</div> =>
                                         # <div>foo</div>
@@ -269,9 +276,10 @@ VALUE TYPE
   Callback
     *   selector => \&foo
 
-        *Code-ref:* Callback subroutine. Subroutine can user $_ as inner
-        HTML or first argument as XML::LibXML::Node object. The value that
-        subroutine returned is allocated by value type.
+        *Code-ref:* Callback subroutine. The callback receives the inner
+        HTML in $_ and an XML::LibXML::Node object as the first argument.
+        Its return value is handled per this list of value types (scalar to
+        replace content, undef to delete, etc.).
 
           $ts->process($template, {
               # samples
@@ -291,9 +299,9 @@ VALUE TYPE
   Filter
     *   selector => [ $value, filter, filter, ... ]
 
-        *Array-ref of Scalars:* Value and filters. Filter can take
+        *Array-ref of Scalars:* Value and filters. Filters may be
 
-        A) Callback subroutine
+        A) Callback subroutine (code reference)
 
         B) Defined filter name
 
@@ -309,7 +317,7 @@ VALUE TYPE
             Some basic filters included. See Template::Semantic::Filter.
 
         $ts->define_filter($filter_name, \&code)
-            You can define the your filter name using "define_filter()".
+            You can define your own filters using "define_filter()".
 
               use Text::Markdown qw/markdown/;
               $ts->define_filter(markdown => sub { \ markdown($_) })
