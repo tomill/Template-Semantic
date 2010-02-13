@@ -225,6 +225,18 @@ use XML::LibXML;
     <a href="zzz" class="yyy">xxx</a>
 </root>
 
+=== elem (root) x hashref
+--- note: test for "replaceChild: HIERARCHY_REQUEST_ERR"
+--- vars
+'/root' => {
+    '.'        => 'xxx',
+    './@class' => 'yyy',
+}
+--- template
+<root class="foo"></root>
+--- expected
+<root class="yyy">xxx</root>
+
 === elem x list (xpath)
 --- vars
 'ul.list li' => [

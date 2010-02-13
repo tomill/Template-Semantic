@@ -146,7 +146,12 @@ sub _assign_value {
              
             my $parted = $self->_to_node($node->serialize);
             $self->_query($parted, $value);
-            $node->replaceNode($parted);
+            
+            if ($node->isSameNode( $self->{dom}->documentElement )) { # to replace root
+                $self->{dom}->setDocumentElement($parted);
+            } else {
+                $node->replaceNode($parted);
+            }
         }
     }
     
@@ -374,7 +379,7 @@ Gets the result as L<XML::LibXML::Document>.
 
 =head1 SEE ALSO
 
-L<Template::Semantic>
+L<Template::Semantic>, L<XML::LibXML::Document>
 
 =head1 AUTHOR
 
