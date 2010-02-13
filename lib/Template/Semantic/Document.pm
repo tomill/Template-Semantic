@@ -41,10 +41,11 @@ sub as_string {
     $opt{is_xhtml} = 1 unless defined $opt{is_xhtml};
     
     if ($self->{source} =~ /^<\?xml/) {
-        return $self->{dom}->serialize(1);
+        return $self->{dom}->serialize;
     }
     else { # for skip <?xml declaration.
         my $r = "";
+        
         if (my $dtd = $self->{dom}->internalSubset) {
             $r = $dtd->serialize . "\n";
         } elsif($opt{is_xhtml}) {
@@ -56,14 +57,15 @@ sub as_string {
             $self->{dom_hacked}++;
         }
         
-        if (my $root = $self->{dom}->documentElement) {
-            $r .= $root->serialize;
-            $r =~ s/\n*$/\n/;
-            
-            if ($self->{xmlns_hacked}) {
-                $r =~ s{(<html[^>]+?)xmlns=""}{$1xmlns="http://www.w3.org/1999/xhtml"};
-            }
+        local $XML::LibXML::skipXMLDeclaration = 1;
+        local $XML::LibXML::skipDTD = 1;
+        $r .= $self->{dom}->serialize;
+        $r =~ s/\n*$/\n/;
+
+        if ($self->{xmlns_hacked}) {
+            $r =~ s{(<html[^>]+?)xmlns=""}{$1xmlns="http://www.w3.org/1999/xhtml"};
         }
+    
         if ($self->{dom_hacked}) {
             $self->{dom}->removeInternalSubset;
             $self->{dom_hacked} = 0;
