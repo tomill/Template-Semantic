@@ -1,6 +1,9 @@
 Revision history for Perl extension Template::Semantic
 
-0.03 Thu Feb 11 03:09:48 JST 2010
+0.04  Sun Feb 14 14:29:12 JST 2010
+        - Fix HIERARCHY_REQUEST_ERR when element to replace is root
+
+0.03  Thu Feb 11 03:09:48 JST 2010
         - POD fixes only (thanks Hans Dieter Pearcey)
 
 0.02  Wed Feb 10 18:33:17 JST 2010
