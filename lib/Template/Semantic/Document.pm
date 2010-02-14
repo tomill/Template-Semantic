@@ -164,11 +164,12 @@ sub _assign_value {
             }
             
             my $container = XML::LibXML::DocumentFragment->new;
+            my $tmpl_xml = $node->serialize;
             my $joint;
             for my $v (@$value) {
                 next if ref($v) ne 'HASH';
                 
-                my $tmpl = $self->_to_node($node->serialize);
+                my $tmpl = $self->_to_node($tmpl_xml);
                 $self->_query($tmpl, $v);
                 $container->addChild($joint->cloneNode) if $joint;
                 $container->addChild($tmpl);
