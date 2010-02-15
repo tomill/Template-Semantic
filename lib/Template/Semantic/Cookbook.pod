@@ -91,9 +91,9 @@ If you want to set the value for JavaScript...
 
 =head2 Add attribute
 
-The following example is output with NOT C<< <div class="foo">foo</div> >>
-like C<< <div>foo</div> >> because LibXML cannot find C<class> attribute
-in C<< <div> >>.
+The following example is NOT output as C<< <div class="foo">foo</div> >>
+but instead as C<< <div>foo</div> >>  because LibXML cannot find C<class>
+attribute in C<< <div> >>.
 
   print Template::Semantic->process(\'<div>foo</div>', {
       'div@class' => 'foo',
