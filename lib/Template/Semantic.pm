@@ -75,11 +75,11 @@ Template::Semantic - Use pure XHTML/XML as a template
       'title, h1' => 'Naoki Tomita',
       'ul.urls li' => [
           {
-              'a' => 'Homepage >',
+              'a' => 'Profile & Contacts',
               'a@href' => 'http://e8y.net/',
           },
           {
-              'a' => 'Twitter >',
+              'a' => 'Twitter',
               'a@href' => 'http://twitter.com/tomita/',
           },
       ],
@@ -104,8 +104,8 @@ output:
       <body>
           <h1>Naoki Tomita</h1>
           <ul class="urls">
-              <li><a href="http://e8y.net/">Homepage &gt;</a></li>
-              <li><a href="http://twitter.com/tomita/">Twitter &gt;</a></li>
+              <li><a href="http://e8y.net/">Profile &amp; Contacts</a></li>
+              <li><a href="http://twitter.com/tomita/">Twitter</a></li>
           </ul>
       </body>
   </html>
