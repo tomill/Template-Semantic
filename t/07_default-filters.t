@@ -107,3 +107,11 @@ BBB&lt;br /&gt;BBB<br />
 CCC<br />
 </p>
 </root>
+
+=== class->call_filter
+--- vars
+'@class' => Template::Semantic->call_filter('sort')
+--- template
+<span class="yyy xxx zzz">foo</span>
+--- expected
+<span class="xxx yyy zzz">foo</span>

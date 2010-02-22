@@ -36,7 +36,9 @@ sub define_filter {
 sub call_filter {
     my ($self, $name) = @_;
     $name ||= "";
-    $self->{filter}{$name} or croak "Filter $name not defined.";
+    my $filter = ref($self) ? $self->{filter}{$name}
+                            : Template::Semantic::Filter->can($name);
+    $filter or croak "Filter $name not defined.";
 }
 
 sub process {
