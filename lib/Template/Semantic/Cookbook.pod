@@ -207,6 +207,31 @@ Output:
   </div>
 
 
+=head2 Email template?
+
+You should use the module like Template::Toolkit ;)
+But if you want to use this module anyway,
+
+  my $out = $ts->process(\*DATA, {
+      'name' => 'Foo & Co.',
+  });
+  
+  my $body = $out->dom->documentElement->findvalue('//*[@class="body"]');
+  
+  __DATA__
+  <html>
+  Subject: <b class="subject">Dear <name>name</name></b>
+  <hr />
+  
+  Body:
+  <pre class="body">Dear <name>name</name>,
+  
+  bla bla
+  bla bla
+  </pre>
+  </html>
+
+
 =head2 Include
 
 It is easy to substitute another C<process()>.
