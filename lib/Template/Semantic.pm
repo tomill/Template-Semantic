@@ -344,7 +344,7 @@ of the array-ref should be hash-ref.
   __DATA__
   <table class="list">
       <tr>
-          <td></td>
+          <th></th>
           <td></td>
       </tr>
   </table>
