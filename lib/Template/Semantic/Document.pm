@@ -299,11 +299,11 @@ Template::Semantic::Document - Template::Semantic Result object
 
 =head1 SYNOPSIS
 
-  my $out = Template::Semantic->process('template.html', {
+  my $res = Template::Semantic->process('template.html', {
       'title, h1' => 'foo',
   });
   
-  my $out = Template::Semantic->process('template.html', {
+  my $res = Template::Semantic->process('template.html', {
       '.foo, .bar' => 'baz',
       '.mee@class' => 'moo',
   })->process({
@@ -314,25 +314,25 @@ Template::Semantic::Document - Template::Semantic Result object
       '.bar' => sub { lc },
   });
   
-  print $out;
-  print $out->as_string; # same as avobe
+  print $res;
+  print $res->as_string; # same as avobe
 
 =head1 METHODS
 
 =over 4
 
-=item $out = $out->process( \%vars )
+=item $res = $res->process( \%vars )
 
 Process again to the result and returns L<Template::Semantic::Document>
 object again. So you can chain
 
   Template::Semantic->process(...)->process(...)
 
-=item "$out" (stringify)
+=item "$res" (stringify)
 
 Calls C<as_string()> internally.
 
-=item $html = $out->as_string( %options )
+=item $html = $res->as_string( %options )
 
 Returns the result as XHTML/XML.
 
@@ -343,7 +343,7 @@ Returns the result as XHTML/XML.
 Default value is true. Even if DTD is not defined in the template, outputs as XHTML.
 When sets C<is_xhtml> false, skip this effect.
 
-  my $out = $ts->process(\<<END);
+  my $res = $ts->process(\<<END);
   <div>
       <img src="foo" />
       <br />
@@ -352,7 +352,7 @@ When sets C<is_xhtml> false, skip this effect.
   END
   ;
   
-  print $out;
+  print $res;
   
   <div>
       <img src="foo" />
@@ -360,7 +360,7 @@ When sets C<is_xhtml> false, skip this effect.
       <textarea></textarea>
   </div>
   
-  print $out->as_string(is_xhtml => 0);
+  print $res->as_string(is_xhtml => 0);
   
   <div>
       <img src="foo"/>
@@ -370,10 +370,10 @@ When sets C<is_xhtml> false, skip this effect.
 
 =back
 
-=item $dom = $out->dom()
+=item $dom = $res->dom()
 
-  my $out  = Template::Semantic->process($template, ...);
-  my $dom  = $out->dom;
+  my $res  = Template::Semantic->process($template, ...);
+  my $dom  = $res->dom;
   my $root = $dom->documentElement; # get root element
 
 Gets the result as L<XML::LibXML::Document>.

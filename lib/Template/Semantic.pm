@@ -131,12 +131,12 @@ B<This is beta release. Your feedback is welcome.>
 Constructs a new C<Template::Semantic> object.
 
   my $ts = Template::Semantic->new;
-  my $out = $ts->process(...);
+  my $res = $ts->process(...);
 
 If you do not want to change the options from the defaults, you may skip
 C<new()> and call C<process()> directly:
 
-  my $out = Template::Semantic->process(...);
+  my $res = Template::Semantic->process(...);
 
 Set %options if you want to change parser options:
 
@@ -169,25 +169,25 @@ See L<XML::LibXML::Parser/PARSER OPTIONS> for details.
 
 =back
 
-=item $out = $ts->process($filename, \%vars)
+=item $res = $ts->process($filename, \%vars)
 
-=item $out = $ts->process(\$text, \%vars)
+=item $res = $ts->process(\$text, \%vars)
 
-=item $out = $ts->process(FH, \%vars)
+=item $res = $ts->process(FH, \%vars)
 
 Process a template and return a L<Template::Semantic::Document> object.
 
 The first parameter is the input template, which may take one of several forms:
 
   # filename
-  my $out = Template::Semantic->process('template.html', $vars);
+  my $res = Template::Semantic->process('template.html', $vars);
   
   # text reference
-  my $out = Template::Semantic->process(\'<html><body>foo</body></html>', $vars);
+  my $res = Template::Semantic->process(\'<html><body>foo</body></html>', $vars);
   
   # file handle
-  my $out = Template::Semantic->process($fh, $vars);
-  my $out = Template::Semantic->process(\*DATA, $vars);
+  my $res = Template::Semantic->process($fh, $vars);
+  my $res = Template::Semantic->process(\*DATA, $vars);
 
 The second parameter is a value set to bind the template. $vars should be a
 hash-ref of selectors and corresponding values.  See the L</SELECTOR> and

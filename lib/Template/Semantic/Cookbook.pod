@@ -212,11 +212,11 @@ Output:
 You should use the module like Template::Toolkit ;)
 But if you want to use this module anyway,
 
-  my $out = $ts->process(\*DATA, {
+  my $res = $ts->process(\*DATA, {
       'name' => 'Foo & Co.',
   });
   
-  my $body = $out->dom->documentElement->findvalue('//*[@class="body"]');
+  my $body = $res->dom->documentElement->findvalue('//*[@class="body"]');
   
   __DATA__
   <html>
@@ -282,10 +282,10 @@ It is possible though is tricky.
           
           # Process wrapper.html,
           # embed this innerHTML to wrapper.html's <div id="content">
-          my $out = $ts->process($wrapper, { '#content' => \$_ });
+          my $res = $ts->process($wrapper, { '#content' => \$_ });
           
           # Insert result(as XML::LibXML::Element) after me.
-          $node->addSibling($out->dom->documentElement);
+          $node->addSibling($res->dom->documentElement);
   
           # And delete me.
           return undef;
