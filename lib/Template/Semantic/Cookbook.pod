@@ -16,7 +16,7 @@ Use XPath power.
           { '//td[1]' => '401', '//td[2]' => '402' },
       ],
   })->process({
-      '//table//tr[position() mod 2 = 0]/@class' => 'even',
+      '//table/tbody/tr[position() mod 2 = 0]/@class' => 'even',
   });
   
   __DATA__
@@ -73,7 +73,7 @@ If you don't like C<class="">, do this.
       '//table//tr[position() mod 2 = 1]/@class' => undef,
   });
 
-=head2 For javascript
+=head2 For JavaScript vars
 
 If you want to set the value for JavaScript...
 
@@ -89,7 +89,7 @@ If you want to set the value for JavaScript...
   </html>
 
 
-=head2 Add attribute
+=head2 Create attribute
 
 The following example is NOT output as C<< <div class="foo">foo</div> >>
 but instead as C<< <div>foo</div> >>  because LibXML cannot find C<class>
@@ -149,7 +149,7 @@ Output:
 
 =head2 Indicator only for Temlate::Semantic
 
-Idea 1 - Original C<data-id> attribute:
+Idea 1 - Original C<data-id> attribute like L<Template::TAL>:
 
   print Template::Semantic->process(\*DATA, {
       '//*[@data-id="foo"]' => 'foo',
@@ -209,13 +209,14 @@ Output:
 
 =head2 Email template?
 
-You should use the module like Template::Toolkit ;)
+You should use the module like Template-Toolkit ;)
 But if you want to use this module anyway,
 
   my $res = $ts->process(\*DATA, {
       'name' => 'Foo & Co.',
   });
   
+  my $subj = $res->dom->documentElement->findvalue('//*[@class="subject"]');
   my $body = $res->dom->documentElement->findvalue('//*[@class="body"]');
   
   __DATA__
@@ -237,50 +238,25 @@ But if you want to use this module anyway,
 It is easy to substitute another C<process()>.
 
   my $ts = Template::Semantic->new;
-  print $ts->process(\*DATA, {
-      '#container' => $ts->process('included.html'),
+  print $ts->process('wrapper.html', {
+      '#container' => $ts->process('include.html'),
   });
-  
-  __DATA__
-  <html>
-      <body>
-          <div>foo</div>
-          <div id="container"></div>
-          <div>bar</div>
-      </body>
-  </html>
-
-Do you want to include filename in the template?
-
-  my $ts = Template::Semantic->new;
-  print $ts->process(\*DATA, {
-      '#container' => sub { $ts->process($_) },
-  });
-  
-  __DATA__
-  <html>
-      <body>
-          <div>foo</div>
-          <div id="container">included.html</div>
-          <div>bar</div>
-      </body>
-  </html>
 
 
-=head2 Wrapper
+=head2 Wrapper/Template inheritance
 
 It is possible though is tricky.
 
   my $ts = Template::Semantic->new;
   
-  print $ts->process('content.html', {
-      '/part' => sub {
+  print $ts->process('foo.html', {
+      '/div' => sub {
           my $node = shift;
           
-          # Get wrapper filename from attribute.
+          # Get wrapper filename from attribute ...
           my $wrapper = $node->getAttribute('wrapper');
           
-          # Process wrapper.html,
+          # Process wrapper.html ...
           # embed this innerHTML to wrapper.html's <div id="content">
           my $res = $ts->process($wrapper, { '#content' => \$_ });
           
@@ -294,12 +270,12 @@ It is possible though is tricky.
       'h1' => 'Hello world!',
   });
 
-content.html
+foo.html
 
-  <part wrapper="wrapper.html">
+  <div wrapper="wrapper.html">
       <h1>foo</h1>
       <p>bla bla bla</p>
-  </part>
+  </div>
 
 wrapper.html
 

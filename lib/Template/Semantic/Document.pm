@@ -304,14 +304,11 @@ Template::Semantic::Document - Template::Semantic Result object
   });
   
   my $res = Template::Semantic->process('template.html', {
-      '.foo, .bar' => 'baz',
-      '.mee@class' => 'moo',
+      ...
   })->process({
-      '#boo@src' => 'grr',
-      '#yea .ye' => 'yoo',
+      ...
   })->process({
-      '.foo' => sub { uc },
-      '.bar' => sub { lc },
+      ...
   });
   
   print $res;
@@ -326,7 +323,7 @@ Template::Semantic::Document - Template::Semantic Result object
 Process again to the result and returns L<Template::Semantic::Document>
 object again. So you can chain
 
-  Template::Semantic->process(...)->process(...)
+  my $res = Template::Semantic->process(...)->process(...)
 
 =item "$res" (stringify)
 
@@ -338,10 +335,10 @@ Returns the result as XHTML/XML.
 
 =over 4
 
-=item * is_xhtml => [1|0]
+=item * is_xhtml => bool
 
-Default value is true. Even if DTD is not defined in the template, outputs as XHTML.
-When sets C<is_xhtml> false, skip this effect.
+Default value is true. Even if DTD is not defined in the template,
+outputs as XHTML. When sets C<is_xhtml> false, skip this effect.
 
   my $res = $ts->process(\<<END);
   <div>
@@ -353,20 +350,18 @@ When sets C<is_xhtml> false, skip this effect.
   ;
   
   print $res;
-  
-  <div>
-      <img src="foo" />
-      <br />
-      <textarea></textarea>
-  </div>
+  # <div>
+  #     <img src="foo" />
+  #     <br />
+  #     <textarea></textarea>
+  # </div>
   
   print $res->as_string(is_xhtml => 0);
-  
-  <div>
-      <img src="foo"/>
-      <br/>
-      <textarea/>
-  </div>
+  # <div>
+  #     <img src="foo"/>
+  #     <br/>
+  #     <textarea/>
+  # </div>
 
 =back
 
