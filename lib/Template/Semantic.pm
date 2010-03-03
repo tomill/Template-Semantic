@@ -4,6 +4,7 @@ use warnings;
 use 5.008000;
 our $VERSION = '0.04';
 use Carp;
+use Scalar::Util qw/blessed/;
 use XML::LibXML;
 use Template::Semantic::Document;
 use Template::Semantic::Filter;
@@ -48,7 +49,8 @@ sub process {
     my $source;
     if (ref($template) eq 'SCALAR') {
         $source = $$template;
-    } elsif (ref $template) {
+    } elsif (ref($template) eq 'GLOB'
+        or blessed($template) && $template->isa('GLOB')) {
         $source = do { local $/; <$template> };
     } else {
         open(my $fh, '<', $template) or croak $!;

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Requires;
 
 use Template::Semantic;
 
@@ -47,6 +48,18 @@ subtest 'file' => sub {
 
     my $ts = Template::Semantic->new;
     my $output = $ts->process('t/01_load-template.xml', {
+        'span' => 'HELLO WORLD',
+    });
+    
+    is($output, $expected);
+};
+
+subtest 'unknown object' => sub {
+    test_requires('Path::Class');
+    plan tests => 1;
+    
+    my $ts = Template::Semantic->new;
+    my $output = $ts->process(file('t/01_load-template.xml'), {
         'span' => 'HELLO WORLD',
     });
     
