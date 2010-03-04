@@ -1,5 +1,11 @@
 Revision history for Perl extension Template::Semantic
 
+0.05  Thu Mar  4 15:50:50 JST 2010
+        - allow Template::Semantic->call_filter
+        - better GLOB detection
+        - More Cookbook
+        - POD fixes
+
 0.04  Sun Feb 14 14:29:12 JST 2010
         - Fix HIERARCHY_REQUEST_ERR when element to replace is root
 
