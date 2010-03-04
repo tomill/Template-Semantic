@@ -122,7 +122,9 @@ and uses XPath or CSS selectors to assign values.
 
 Constructs a new C<Template::Semantic> object.
 
-  my $ts = Template::Semantic->new;
+  my $ts = Template::Semantic->new(
+      ...
+  );
   my $res = $ts->process(...);
 
 If you do not want to change the options from the defaults, you may skip
@@ -201,7 +203,9 @@ See the L</Filter> section.
 
 =head1 SELECTOR
 
-Use XPath expression or CSS selector as a selector.
+Use XPath expression or CSS selector as a selector. If the expression
+doesn't look like XPath, it is considered CSS selector and converted
+into XPath internally.
 
   print Template::Semantic->process($template, {
       
@@ -217,8 +221,8 @@ Use XPath expression or CSS selector as a selector.
       
       # CSS selector sample that indicate <tag>
       'title'         => ...,
-      '.foo span.bar' => ...,
       '#foo'          => ...,
+      '.foo span.bar' => ...,
       
       # CSS selector sample that indicate @attr
       'img#foo@src'     => ...,
@@ -230,16 +234,15 @@ Use XPath expression or CSS selector as a selector.
 Template::Semantic allows some selector syntax that is different
 from usual XPath for your convenience.
 
-1. You can specify tag without using L<XML::LibXML::XPathContext>
-even if your template has default namespace (C<< <html xmlns="..." >>).
+1. You can use xpath C<'//div'> without using L<XML::LibXML::XPathContext>
+even if your template has default namespace (C<< <html xmlns="..."> >>).
 
-2. You can use 'id()' function to find element with C<id=""> attribute
-instead of C<xml:id="">.
+2. You can use C<'id("foo")'> function to find element with C<id="foo">
+instead of C<xml:id="foo"> without DTD. Note: use C<'//*[@xml:id="foo"]'>
+if your template uses C<xml:id="foo">.
 
-3. If the expression looks like CSS selector, it is converted to XPath
-internally.
-
-4. You can specify the attribute by using '@attr' syntax with CSS selector.
+3. You can C<'@attr'> syntax with CSS selector that specifies the attribute.
+This is original syntax of this module.
 
 
 =head1 VALUE TYPE

@@ -14,6 +14,30 @@ __DATA__
     <span id="foo">xxx</span>
 </div>
 
+=== id() cannot catch xml:id
+--- vars
+'id("foo")' => 'xxx'
+--- template
+<div>
+    <span xml:id="foo">foo</span>
+</div>
+--- expected
+<div>
+    <span xml:id="foo">foo</span>
+</div>
+
+=== use @xml:id="" instead of id()
+--- vars
+'//*[@xml:id="foo"]' => 'xxx'
+--- template
+<div>
+    <span xml:id="foo">foo</span>
+</div>
+--- expected
+<div>
+    <span xml:id="foo">xxx</span>
+</div>
+
 === xhtml default xmlns hack
 --- vars
 '//span' => 'xxx'
@@ -24,6 +48,21 @@ __DATA__
 --- expected
 <html xmlns="http://www.w3.org/1999/xhtml">
     <span>xxx</span>
+</html>
+
+=== xhtml with xmlns
+--- vars
+'//span' => 'xxx',
+'//foo:span' => 'zzz',
+--- template
+<html xmlns:foo="http://example/foo">
+    <span>foo</span>
+    <foo:span>foo</foo:span>
+</html>
+--- expected
+<html xmlns:foo="http://example/foo">
+    <span>xxx</span>
+    <foo:span>zzz</foo:span>
 </html>
 
 === no dtd, no xml declaration
