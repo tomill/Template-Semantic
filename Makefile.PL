@@ -8,7 +8,7 @@ requires 'XML::LibXML' => 1.69;
 requires 'HTML::Selector::XPath';
 requires 'Scalar::Util' => 1.19;
 
-test_requires 'Test::More' => 0.88;
+test_requires 'Test::More' => 0.90;
 test_requires 'Test::Requires';
 use_test_base;
 author_tests 'xt';
