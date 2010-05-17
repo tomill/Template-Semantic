@@ -1,5 +1,6 @@
 Revision history for Perl extension Template::Semantic
 
+0.06  Mon May 17 19:36:54 JST 2010
         - Require Test::More 0.94 for subtest()
 
 0.05  Thu Mar  4 15:50:50 JST 2010
