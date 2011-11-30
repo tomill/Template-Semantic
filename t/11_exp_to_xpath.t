@@ -99,19 +99,19 @@ E > F@foo
 --- exp
 E:first-child@foo
 --- xpath
-//*[1]/self::E/@foo
+//E[count(preceding-sibling::*) = 0 and parent::*]/@foo
 
 ===
 --- exp
 F E:first-child@foo
 --- xpath
-//F//*[1]/self::E/@foo
+//F//E[count(preceding-sibling::*) = 0 and parent::*]/@foo
 
 ===
 --- exp
 F > E:first-child@foo
 --- xpath
-//F/*[1]/self::E/@foo
+//F/E[count(preceding-sibling::*) = 0 and parent::*]/@foo
 
 ===
 --- exp
@@ -177,7 +177,7 @@ E#myid@foo
 --- exp
 E:nth-child(1)@foo
 --- xpath
-//E[count(preceding-sibling::*) = 0]/@foo
+//E[count(preceding-sibling::*) = 0 and parent::*]/@foo
 
 ===
 --- exp
