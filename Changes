@@ -1,5 +1,8 @@
 Revision history for Perl extension Template::Semantic
 
+0.08  Fri Dec  2 11:06:35 JST 2011
+        - no code changes. fix packaging problem.
+
 0.07  Fri Dec  2 10:53:53 JST 2011
         - Follow HTML::Selector::XPath changes (thanks squeeks)
           https://github.com/tomi-ru/Template-Semantic/pull/5
