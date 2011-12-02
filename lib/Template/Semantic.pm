@@ -2,7 +2,7 @@ package Template::Semantic;
 use strict;
 use warnings;
 use 5.008000;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Carp;
 use Scalar::Util qw/blessed/;
 use XML::LibXML;
