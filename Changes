@@ -1,5 +1,9 @@
 Revision history for Perl extension Template::Semantic
 
+0.09  Sat Oct 27 17:25:55 JST 2012
+        - Update Module::Install
+          respond to http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
 0.08  Fri Dec  2 11:06:35 JST 2011
         - no code changes. fix packaging problem.
 
