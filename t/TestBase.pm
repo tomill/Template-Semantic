@@ -19,28 +19,34 @@ sub run_template_process {
     my $ts = Template::Semantic->new;
 
     run {
-        my $block = shift;
-        
-        my $out;
-        eval {
-            $out = $ts->process(\$block->template, $block->vars);
-        };
-        
-        if ($@) {
-            if ($block->error) {
-                like($@, $block->error, $block->name);
+        TODO: {
+            my $block = shift;
+
+            # Use of "local $TODO" under Test::Base doesn't work as
+            # expected, so skip TODO tests altogether.
+            todo_skip $block->name, 1 if $block->name =~ /\bTODO\b/;
+
+            my $out;
+            eval {
+                $out = $ts->process(\$block->template, $block->vars);
+            };
+
+            if ($@) {
+                if ($block->error) {
+                    like($@, $block->error, $block->name);
+                } else {
+                    is($@, "", $block->name);
+                }
             } else {
-                is($@, "", $block->name);
+                my $name = $block->name;
+                if ($opt{selector_test}) {
+                    my ($selector)
+                        = $block->original_values->{vars} =~ /(.*?) =>/;
+                    $name .= ": $selector";
+                }
+
+                is($out->as_string, $block->expected, $name);
             }
-        } else {
-            my $name = $block->name;
-            if ($opt{selector_test}) {
-                my ($selector)
-                    = $block->original_values->{vars} =~ /(.*?) =>/;
-                $name .= ": $selector";
-            }
-            
-            is($out->as_string, $block->expected, $name);
         }
     };
 }
