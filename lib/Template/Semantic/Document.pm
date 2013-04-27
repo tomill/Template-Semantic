@@ -5,6 +5,7 @@ use Carp;
 use HTML::Selector::XPath;
 use Scalar::Util qw/blessed/;
 use XML::LibXML;
+use Clone qw/clone/;
 
 use overload q{""} => sub { shift->as_string }, fallback => 1;
 
@@ -147,7 +148,7 @@ sub _assign_value {
             }
              
             my $parted = $self->_to_node($node->serialize);
-            $self->_query($parted, $value);
+            $self->_query($parted, clone($value));
             
             if ($node->isSameNode( $self->{dom}->documentElement )) { # to replace root
                 $self->{dom}->setDocumentElement($parted);
@@ -170,7 +171,7 @@ sub _assign_value {
                 next if ref($v) ne 'HASH';
                 
                 my $tmpl = $self->_to_node($tmpl_xml);
-                $self->_query($tmpl, $v);
+                $self->_query($tmpl, clone($v));
                 $container->addChild($joint->cloneNode) if $joint;
                 $container->addChild($tmpl);
                 
