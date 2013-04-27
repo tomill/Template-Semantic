@@ -8,6 +8,7 @@ bugtracker 'http://github.com/tomi-ru/Template-Semantic/issues';
 requires 'XML::LibXML' => 1.69;
 requires 'HTML::Selector::XPath' => 0.09;
 requires 'Scalar::Util' => 1.19;
+requires 'Clone';
 
 test_requires 'Test::More' => 0.94; # subtest
 test_requires 'Test::Base';
