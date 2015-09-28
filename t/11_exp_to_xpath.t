@@ -3,6 +3,9 @@ use warnings;
 use Test::Base; plan tests => 1 * blocks;
 
 use Template::Semantic;
+use HTML::Selector::XPath;
+
+my $hsx_version = $HTML::Selector::XPath::VERSION || 0;
 
 filters {
     exp => 'chomp',
@@ -11,7 +14,12 @@ filters {
 
 run {
     my $block = shift;
-    my $xpath = Template::Semantic::Document->_exp_to_xpath($block->exp);
+    my $exp = $block->exp;
+    # normalize-space seems to have been added in v0.17
+    if ($hsx_version < 0.17) {
+        $exp =~ s{normalize-space\((\@class)\)}{$1};
+    }
+    my $xpath = Template::Semantic::Document->_exp_to_xpath($exp);
     is($xpath, $block->xpath, $block->exp);
 };
 
@@ -51,7 +59,7 @@ __DATA__
 --- exp
 .foo
 --- xpath
-//*[contains(concat(' ', @class, ' '), ' foo ')]
+//*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]
 
 ===
 --- exp
@@ -135,7 +143,7 @@ E + #bar@foo
 --- exp
 E + .bar@foo
 --- xpath
-//E/following-sibling::*[1]/self::*[contains(concat(' ', @class, ' '), ' bar ')]/@foo
+//E/following-sibling::*[1]/self::*[contains(concat(' ', normalize-space(@class), ' '), ' bar ')]/@foo
 
 ===
 --- exp
@@ -165,7 +173,7 @@ E[lang|="en"]@foo
 --- exp
 DIV.warning@foo
 --- xpath
-//DIV[contains(concat(' ', @class, ' '), ' warning ')]/@foo
+//DIV[contains(concat(' ', normalize-space(@class), ' '), ' warning ')]/@foo
 
 ===
 --- exp
