@@ -2,8 +2,8 @@ use inc::Module::Install;
 all_from 'lib/Template/Semantic.pm';
 
 readme_from;
-repository 'http://github.com/tomi-ru/Template-Semantic';
-bugtracker 'http://github.com/tomi-ru/Template-Semantic/issues';
+repository 'http://github.com/tomill/Template-Semantic';
+bugtracker 'http://github.com/tomill/Template-Semantic/issues';
 
 requires 'XML::LibXML' => 1.69;
 requires 'HTML::Selector::XPath' => 0.09;
