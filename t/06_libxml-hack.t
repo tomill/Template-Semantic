@@ -1,3 +1,5 @@
+use FindBin;
+use lib "$FindBin::Bin/..";
 use t::TestBase;
 run_template_process;
 

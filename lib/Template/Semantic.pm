@@ -2,17 +2,17 @@ package Template::Semantic;
 use strict;
 use warnings;
 use 5.008000;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Carp;
 use Scalar::Util qw/blessed/;
-use XML::LibXML;
+use XML::LibXML ();
 use Template::Semantic::Document;
 use Template::Semantic::Filter;
 
 sub new {
     my ($class, %opt) = @_;
     my $self  = bless { }, $class;
-    
+
     $self->{parser} = delete $opt{parser};
     $self->{parser} ||= do {
         my $parser = XML::LibXML->new;
@@ -21,11 +21,11 @@ sub new {
         $parser->$_($opt{$_}) for keys %opt;
         $parser;
     };
-    
+
     for (@Template::Semantic::Filter::EXPORT_OK) {
         $self->define_filter($_ => \&{'Template::Semantic::Filter::' . $_});
     }
-    
+
     $self;
 }
 
@@ -45,7 +45,7 @@ sub call_filter {
 sub process {
     my $self = ref $_[0] ? shift : shift->new;
     my ($template, $vars) = @_;
-    
+
     my $source;
     if (ref($template) eq 'SCALAR') {
         $source = $$template;
@@ -56,7 +56,7 @@ sub process {
         open(my $fh, '<', $template) or croak $!;
         $source = do { local $/; <$fh> };
     }
-    
+
     my $doc = Template::Semantic::Document->new(
         engine => $self,
         source => $source || "",
@@ -74,7 +74,7 @@ Template::Semantic - Use pure XHTML/XML as a template
 =head1 SYNOPSIS
 
   use Template::Semantic;
-  
+
   print Template::Semantic->process('template.html', {
       'title, h1' => 'Naoki Tomita',
       'ul.urls li' => [
@@ -157,7 +157,7 @@ See L<XML::LibXML::Parser/PARSER OPTIONS> for details.
 
   # "use strict;" style
   my $ts = Template::Semantic->new( recover => 0 );
-  
+
   # "use warnings;" style
   my $ts = Template::Semantic->new( recover => 1 );
 
@@ -175,10 +175,10 @@ The first parameter is the input template, which may take one of several forms:
 
   # filename
   my $res = Template::Semantic->process('template.html', $vars);
-  
+
   # text reference
   my $res = Template::Semantic->process(\'<html><body>foo</body></html>', $vars);
-  
+
   # file handle, GLOB
   my $res = Template::Semantic->process($fh, $vars);
   my $res = Template::Semantic->process(\*DATA, $vars);
@@ -208,27 +208,27 @@ doesn't look like XPath, it is considered CSS selector and converted
 into XPath internally.
 
   print Template::Semantic->process($template, {
-      
+
       # XPath sample that indicate <tag>
       '/html/body/h2[2]' => ...,
       '//title | //h1'   => ...,
       '//img[@id="foo"]' => ...,
       'id("foo")'        => ...,
-      
+
       # XPath sample that indicate @attr
       '//a[@id="foo"]/@href'              => ...,
       '//meta[@name="keywords"]/@content' => ...,
-      
+
       # CSS selector sample that indicate <tag>
       'title'         => ...,
       '#foo'          => ...,
       '.foo span.bar' => ...,
-      
+
       # CSS selector sample that indicate @attr
       'img#foo@src'     => ...,
       'span.bar a@href' => ...,
       '@alt, @title'    => ...,
-  
+
   });
 
 Template::Semantic allows some selector syntax that is different
@@ -258,7 +258,7 @@ I<Scalar:> Replace the inner content with this as Text.
   $ts->process($template, {
       'h1' => 'foo & bar',   # <h1></h1> =>
                              # <h1>foo &amp; bar</h1>
-       
+
       '.foo@href' => '/foo', # <a href="#" class="foo">bar</a> =>
                              # <a href="/foo" class="foo">bar</a>
   });
@@ -279,7 +279,7 @@ I<undef:> Delete the element/attirbute that the selector indicates.
   $ts->process($template, {
       'h1'            => undef, # <div><h1>foo</h1>bar</div> =>
                                 # <div>bar</div>
-      
+
       'div.foo@class' => undef, # <div class="foo">foo</div> =>
                                 # <div>foo</div>
   });
@@ -303,22 +303,22 @@ Replace the inner content by another C<process()>-ed result.
 =item * selector => { 'selector' => $value, ... }
 
 I<Hash-ref:> Sub query of the part.
- 
+
   $ts->process($template, {
       # All <a> tag *in <div class="foo">* disappears
       'div.foo' => {
           'a' => undef,
       },
-      
+
       # same as above
       'div.foo a' => undef,
-      
+
       # xpath '.' = current node (itself)
       'a#bar' => {
           '.'       => 'foobar',
           './@href' => 'foo.html',
       },
-      
+
       # same as above
       'a#bar'       => 'foobar',
       'a#bar/@href' => 'foo.html',
@@ -343,7 +343,7 @@ of the array-ref should be hash-ref.
           { 'th' => 'ccc', 'td' => '003' },
       ],
   });
-  
+
   __DATA__
   <table class="list">
       <tr>
@@ -390,10 +390,10 @@ Its return value is handled per this list of value types
       # samples
       'h1' => sub { "bar" }, # <h1>foo</h1> => <h1>bar</h1>
       'h1' => sub { undef }, # <h1>foo</h1> => disappears
-      
+
       # sample: use $_
       'h1' => sub { uc },  # <h1>foo</h1> => <h1>FOO</h1>
-      
+
       # sample: use $_[0]
       'h1' => sub {
           my $node = shift;

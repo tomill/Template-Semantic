@@ -1,5 +1,11 @@
 Revision history for Perl extension Template::Semantic
 
+{{$NEXT}}
+        - Switch to Minilla
+        - Fixes for gh#3 gh#7 gh#6 gh#10
+        - Close pr#9 pr#11 pr#13
+        - Support DocumentFragment Node
+
 0.09  Sat Oct 27 17:25:55 JST 2012
         - Update Module::Install
           respond to http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
