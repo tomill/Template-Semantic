@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use HTML::Selector::XPath;
 use Scalar::Util qw/blessed/;
-use XML::LibXML;
+use XML::LibXML ':libxml';
 
 use overload q{""} => sub { shift->as_string }, fallback => 1;
 
@@ -18,7 +18,7 @@ sub new {
         $self->{xmlns_hacked} = 1;
         $1 . 'xmlns=""';
     }e;
-    
+
     if ($self->{engine}{parser}->get_option('recover')) {
         $source =~ s/&(?!\w+;|#(?:x[a-fA-F0-9]+|\d+);)/&amp;/g;
     }
@@ -37,15 +37,15 @@ sub process {
 
 sub as_string {
     my ($self, %opt) = @_;
-    
+
     $opt{is_xhtml} = 1 unless defined $opt{is_xhtml};
-    
+
     if ($self->{source} =~ /^<\?xml/) {
         return $self->{dom}->serialize;
     }
     else { # for skip <?xml declaration.
         my $r = "";
-        
+
         if (my $dtd = $self->{dom}->internalSubset) {
             $r = $dtd->serialize . "\n";
         } elsif($opt{is_xhtml}) {
@@ -56,7 +56,7 @@ sub as_string {
             );
             $self->{dom_hacked}++;
         }
-        
+
         local $XML::LibXML::skipXMLDeclaration = 1;
         local $XML::LibXML::skipDTD = 1;
         $r .= $self->{dom}->serialize;
@@ -65,12 +65,12 @@ sub as_string {
         if ($self->{xmlns_hacked}) {
             $r =~ s{(<html[^>]+?)xmlns=""}{$1xmlns="http://www.w3.org/1999/xhtml"};
         }
-    
+
         if ($self->{dom_hacked}) {
             $self->{dom}->removeInternalSubset;
             $self->{dom_hacked} = 0;
         }
-        
+
         return $r;
     }
 }
@@ -92,7 +92,7 @@ my $element_with_attr_regex = qr{
 sub _exp_to_xpath {
     my ($self, $exp) = @_;
     return unless $exp;
-    
+
     my $xpath;
     if ($exp =~ m{^(?:/|\.(?:/|$))}) {
         $xpath = $exp;
@@ -122,33 +122,33 @@ sub _exp_to_xpath {
 sub _query {
     my ($self, $context, $vars) = @_;
     croak "\$vars must be hashref." if ref($vars) ne 'HASH';
-    
+
     for my $exp (keys %$vars) {
         my $xpath = $self->_exp_to_xpath($exp) or next;
         my $nodes = $context->findnodes($xpath);
-        $self->_assign_value($nodes, delete $vars->{$exp});
+        $self->_assign_value($nodes, $vars->{$exp});
     }
 }
 
 sub _assign_value {
     my ($self, $nodes, $value) = @_;
     my $value_type = ref $value;
-    
+
     if (not defined $value) { # => delete
         for my $node (@$nodes) {
             $node->unbindNode;
         }
     }
-    
+
     elsif ($value_type eq 'HASH') { # => sub query
         for my $node (@$nodes) {
             if (not $node->isa('XML::LibXML::Element')) {
                 croak "Can't assign hashref to " . ref($node);
             }
-             
+
             my $parted = $self->_to_node($node->serialize);
             $self->_query($parted, $value);
-            
+
             if ($node->isSameNode( $self->{dom}->documentElement )) { # to replace root
                 $self->{dom}->setDocumentElement($parted);
             } else {
@@ -156,24 +156,24 @@ sub _assign_value {
             }
         }
     }
-    
+
     elsif ($value_type eq 'ARRAY' and ref($value->[0]) eq 'HASH') { # => sub query loop
         for my $node (@$nodes) {
             if (not $node->isa('XML::LibXML::Element')) {
                 croak "Can't assign loop list to " . ref($node);
             }
-            
+
             my $container = XML::LibXML::DocumentFragment->new;
             my $tmpl_xml = $node->serialize;
             my $joint;
             for my $v (@$value) {
                 next if ref($v) ne 'HASH';
-                
+
                 my $tmpl = $self->_to_node($tmpl_xml);
                 $self->_query($tmpl, $v);
                 $container->addChild($joint->cloneNode) if $joint;
                 $container->addChild($tmpl);
-                
+
                 if (not defined $joint) { # 2nd item
                     my $p = $node->previousSibling;
                     $joint = ($p and $p->serialize =~ /^(\W+)$/s) ? $p : "";
@@ -182,7 +182,7 @@ sub _assign_value {
             $node->replaceNode($container);
         }
     }
-    
+
     elsif ($value_type eq 'ARRAY') { # => value, filter, filter, ...
         my ($value, @filters) = @$value;
         for my $filter (@filters) {
@@ -190,10 +190,10 @@ sub _assign_value {
                 $filter = $self->{engine}->call_filter($filter);
             }
         }
-        
+
         for my $node (@$nodes) {
             $self->_assign_value([$node], $value);
-            
+
             for my $filter (@filters) {
                 $self->_assign_value([$node], $filter);
             }
@@ -216,7 +216,7 @@ sub _assign_value {
             $self->_assign_value([$node], $ret);
         }
     }
-    
+
     elsif (blessed($value) and $value->isa('Template::Semantic::Document')) { # => insert result
         for my $node (@$nodes) {
             if (not $node->isa('XML::LibXML::Element')) {
@@ -254,10 +254,13 @@ sub _to_node {
 
 sub _replace_node {
     my ($self, $node, @replace) = @_;
-    
+
     if ($node->isa('XML::LibXML::Element')) {
         $node->removeChildNodes;
-        $node->addChild($_->cloneNode(1)) for @replace;
+        for (@replace) {
+            $node->addChild($_->cloneNode(1)), next unless $_->nodeType == XML_DOCUMENT_FRAG_NODE;
+            $node->appendChild($_->cloneNode(1));
+        }
     }
     elsif ($node->isa('XML::LibXML::Attr')) {
         $node->setValue(join "", map { $_->textContent } @replace);
@@ -302,7 +305,7 @@ Template::Semantic::Document - Template::Semantic Result object
   my $res = Template::Semantic->process('template.html', {
       'title, h1' => 'foo',
   });
-  
+
   my $res = Template::Semantic->process('template.html', {
       ...
   })->process({
@@ -310,7 +313,7 @@ Template::Semantic::Document - Template::Semantic Result object
   })->process({
       ...
   });
-  
+
   print $res;
   print $res->as_string; # same as avobe
 
@@ -348,14 +351,14 @@ outputs as XHTML. When sets C<is_xhtml> false, skip this effect.
   </div>
   END
   ;
-  
+
   print $res;
   # <div>
   #     <img src="foo" />
   #     <br />
   #     <textarea></textarea>
   # </div>
-  
+
   print $res->as_string(is_xhtml => 0);
   # <div>
   #     <img src="foo"/>

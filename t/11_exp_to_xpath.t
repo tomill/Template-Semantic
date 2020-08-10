@@ -51,7 +51,7 @@ __DATA__
 --- exp
 .foo
 --- xpath
-//*[contains(concat(' ', @class, ' '), ' foo ')]
+//*[contains(concat(' ', normalize-space(@class), ' '), ' foo ')]
 
 ===
 --- exp
@@ -135,7 +135,7 @@ E + #bar@foo
 --- exp
 E + .bar@foo
 --- xpath
-//E/following-sibling::*[1]/self::*[contains(concat(' ', @class, ' '), ' bar ')]/@foo
+//E/following-sibling::*[1]/self::*[contains(concat(' ', normalize-space(@class), ' '), ' bar ')]/@foo
 
 ===
 --- exp
@@ -165,7 +165,7 @@ E[lang|="en"]@foo
 --- exp
 DIV.warning@foo
 --- xpath
-//DIV[contains(concat(' ', @class, ' '), ' warning ')]/@foo
+//DIV[contains(concat(' ', normalize-space(@class), ' '), ' warning ')]/@foo
 
 ===
 --- exp

@@ -18,7 +18,7 @@ Use XPath power.
   })->process({
       '//table/tbody/tr[position() mod 2 = 0]/@class' => 'even',
   });
-  
+
   __DATA__
   <table>
       <thead>
@@ -127,7 +127,7 @@ If template contains dummy items to check design, you may delete them first.
           { '.' => 'EEE' },
       ],
   });
-  
+
   __DATA__
   <ul>
       <li>sample</li>
@@ -157,7 +157,7 @@ Idea 1 - Original C<data-id> attribute like L<Template::TAL>:
   })->process({
       '//@data-id' => undef,
   });
-  
+
   __DATA__
   <div>
       <span data-id="foo">xxx</span>
@@ -174,7 +174,7 @@ Idea 2 - Original C<x-foobar> class:
           join " ", grep { !/^x-/ } split /\s+/;
       },
   });
-  
+
   __DATA__
   <div>
       <span class="x-foo">xxx</span>
@@ -194,7 +194,7 @@ Output format config in template:
   })->process({
       '//@data-format' => undef,
   });
-  
+
   __DATA__
   <div class="entry">
       <div class="date" data-format="%Y/%m/%d">2010/99/99</div>
@@ -215,18 +215,18 @@ But if you want to use this module anyway,
   my $res = $ts->process(\*DATA, {
       'name' => 'Foo & Co.',
   });
-  
+
   my $subj = $res->dom->documentElement->findvalue('//*[@class="subject"]');
   my $body = $res->dom->documentElement->findvalue('//*[@class="body"]');
-  
+
   __DATA__
   <html>
   Subject: <b class="subject">Dear <name>name</name></b>
   <hr />
-  
+
   Body:
   <pre class="body">Dear <name>name</name>,
-  
+
   bla bla
   bla bla
   </pre>
@@ -248,21 +248,21 @@ It is easy to substitute another C<process()>.
 It is possible though is tricky.
 
   my $ts = Template::Semantic->new;
-  
+
   print $ts->process('foo.html', {
       '/div' => sub {
           my $node = shift;
-          
+
           # Get wrapper filename from attribute ...
           my $wrapper = $node->getAttribute('wrapper');
-          
+
           # Process wrapper.html ...
           # embed this innerHTML to wrapper.html's <div id="content">
           my $res = $ts->process($wrapper, { '#content' => \$_ });
-          
+
           # Insert result(as XML::LibXML::Element) after me.
           $node->addSibling($res->dom->documentElement);
-  
+
           # And delete me.
           return undef;
       }

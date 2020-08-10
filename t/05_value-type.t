@@ -1,3 +1,5 @@
+use FindBin;
+use lib "$FindBin::Bin/..";
 use t::TestBase;
 run_template_process;
 
@@ -1418,3 +1420,52 @@ use XML::LibXML;
 --- expected
 <div>foo</div>
 
+=== multi hash
+--- vars
+'a' => { '.' => 'xxx' }
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi sub hash
+--- vars
+'a' => sub { { '.' => 'xxx' } }
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi scalar
+--- vars
+'a' => 'xxx'
+--- template
+<div><a></a><span><a></a></span><a></a></div>
+--- expected
+<div><a>xxx</a><span><a>xxx</a></span><a>xxx</a></div>
+
+=== multi github issue #3
+--- vars
+'.navigation' => [ { 'a' => 'Link 1' }, { 'a' => 'Link 2' } ]
+--- template
+<body>
+    <ul id="topnav">
+        <li class="navigation"><a href="...">Top Nav</a></li>
+    </ul>
+    <div id="content">...</div>
+    <ul id="bottomnav">
+        <li class="navigation"><a href="...">Bottom Nav</a></li>
+    </ul>
+</body>
+--- expected
+<body>
+    <ul id="topnav">
+        <li class="navigation"><a href="...">Link 1</a></li>
+        <li class="navigation"><a href="...">Link 2</a></li>
+    </ul>
+    <div id="content">...</div>
+    <ul id="bottomnav">
+        <li class="navigation"><a href="...">Link 1</a></li>
+        <li class="navigation"><a href="...">Link 2</a></li>
+    </ul>
+</body>

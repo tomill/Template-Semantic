@@ -1,0 +1,82 @@
+{
+   "abstract" : "Use pure XHTML/XML as a template",
+   "author" : [
+      "Naoki Tomita <tomita@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Template-Semantic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Base" : "0",
+            "Test::More" : "0.94",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Selector::XPath" : "0.17",
+            "Scalar::Util" : "1.19",
+            "XML::LibXML" : "1.69",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomill/Template-Semantic/issues"
+      },
+      "homepage" : "https://github.com/tomill/Template-Semantic",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tomill/Template-Semantic.git",
+         "web" : "https://github.com/tomill/Template-Semantic"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Alex Peters <lxp@cpan.org>",
+      "Hans Dieter Pearcey <hdp@weftsoar.net>",
+      "Squeeks <squeek@cpan.org>",
+      "vividsnow <vividsnow@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.05",
+   "x_static_install" : 1
+}

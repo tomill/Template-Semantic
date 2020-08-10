@@ -12,3 +12,11 @@ nytprof.out
 MANIFEST.bak
 *~
 *.sw[po]
+/Template-Semantic-*
+/.build
+!META.json
+/_build_params
+/Build
+/Build.bat
+!Build/
+!LICENSE
