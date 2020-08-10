@@ -1,6 +1,8 @@
 Revision history for Perl extension Template::Semantic
 
 {{$NEXT}}
+
+0.10 2020-08-10T08:25:28Z
         - Switch to Minilla
         - Fixes for gh#3 gh#7 gh#6 gh#10
         - Close pr#9 pr#11 pr#13
